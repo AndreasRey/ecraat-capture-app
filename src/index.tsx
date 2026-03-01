@@ -10,6 +10,9 @@ import 'capture-core-utils/extensions/arrayToHashMap';
 import './locales'; //eslint-disable-line
 import { AppStart } from './components/AppStart';
 
+// ECRAAT: Import UI customization overrides
+import './ecraat/ecraat-overrides.css';
+
 // eslint-disable-next-line no-underscore-dangle
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({

@@ -19,6 +19,9 @@ import {
 } from './InvalidCategoryCombinationForOrgUnitMessage/InvalidCategoryCombinationForOrgUnitMessage';
 import { NoSelectionsInfoBox } from './NoSelectionsInfoBox';
 import './mainPageBody.css';
+// ECRAAT: Import register button and config
+import { EcraatRegisterButton } from '../../../EcraatRegisterButton';
+import { ecraatConfig } from '../../../../../../ecraat';
 
 const styles: Readonly<any> = {
     listContainer: {
@@ -110,6 +113,13 @@ const MainPageBodyPlain = ({
                     {mainPageStatus === MainPageStatuses.SHOW_WORKING_LIST && (
                         <div className={classes.container} data-test={'main-page-working-list'}>
                             <div className={cx(classes.leftColumn, 'left-column-main-page')}>
+                                {/* ECRAAT: Show register button above the working list */}
+                                {ecraatConfig.mainPage.hideScopeSelector && (
+                                    <EcraatRegisterButton
+                                        programId={programId}
+                                        orgUnitId={orgUnitId}
+                                    />
+                                )}
                                 <WorkingListsType
                                     programId={programId}
                                     orgUnitId={orgUnitId}
