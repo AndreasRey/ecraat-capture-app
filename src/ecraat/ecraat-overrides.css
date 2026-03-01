@@ -1,17 +1,22 @@
 /*
  * ECRAAT UI Overrides
  * ====================
- * CSS-only hiding of upstream Capture App UI elements.
+ * CSS-based backup for hiding upstream Capture App UI elements.
+ *
+ * The primary hiding mechanism is code-level (conditional rendering in
+ * ScopeSelector, TemplateSelector, ListViewMain). This CSS file serves as
+ * a safety net and is imported once from the app entry point (src/index.tsx).
  *
  * We target elements using their `data-test` attributes and HTML `id`s which
  * are stable across upstream releases (used by the upstream Cypress test suite).
  *
- * This file is imported once from the app entry point (src/index.tsx).
  * To disable any override, simply comment out or remove the relevant block.
  */
 
-/* ─── 1. Hide the ScopeSelector top bar (Program + OrgUnit + Search + Clear) ─── */
-[data-test="scope-selector"] {
+/* ─── 1. Hide the QuickSelector bar inside scope-selector ─── */
+/* The scope-selector div itself is kept (it shows the org unit name header via
+   ECRAAT code), but just in case the QuickSelector somehow renders, hide it */
+[data-test="scope-selector"] > div:has([data-test="org-unit-field"]) {
     display: none !important;
 }
 
@@ -19,17 +24,13 @@
 [data-test="workinglists-template-selector-chips-container"] {
     display: none !important;
 }
-/* Also hide the parent container border/padding that wraps the chips */
-[data-test="workinglists-template-selector-chips-container"] + div {
-    display: none !important;
-}
 
-/* ─── 3. Hide the working list filter bar (filter buttons row) ─── */
+/* ─── 3. Hide the working list filter bar (filter buttons, column selector, menu) ─── */
 #top-bar-container-list-view-main {
     display: none !important;
 }
 
-/* ─── 4. Adjust spacing when top bar is hidden ─── */
+/* ─── 4. Adjust spacing when elements are hidden ─── */
 [data-test="main-page-working-list"] {
     padding-top: 0;
 }

@@ -10,6 +10,8 @@ import { OnlineList } from '../../List';
 import { ListViewMenu } from '../Menu';
 import type { Props } from './listViewMain.types';
 import './listViewMain.css';
+// ECRAAT: Import config to conditionally hide filters and list view controls
+import { ecraatConfig } from '../../../../../ecraat';
 
 const ListWithEndColumnMenu = withEndColumnMenu()(OnlineList);
 
@@ -56,6 +58,11 @@ class ListViewMainPlain extends React.PureComponent<Props & WithStyles<typeof ge
 
         if (isSelectionInProgress) {
             return bulkActionBarComponent;
+        }
+
+        // ECRAAT: Hide the entire filter/controls bar when configured
+        if (ecraatConfig.mainPage.hideWorkingListFilters) {
+            return null;
         }
 
         return (

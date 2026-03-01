@@ -35,13 +35,12 @@ export const ecraatConfig = {
 
 **To disable any customization**, just set the flag to `false` — no other file changes needed for CSS-based overrides.
 
-### 2. `src/ecraat/ecraat-overrides.css` — CSS-only element hiding
+### 2. `src/ecraat/ecraat-overrides.css` — CSS backup for element hiding
 
-Uses `data-test` attributes and HTML `id` attributes (stable across upstream releases because they're used by the upstream Cypress test suite) to hide elements with `display: none !important`.
+A safety-net CSS file using `data-test` attributes and HTML `id`s to hide elements. The **primary** hiding mechanism is code-level (conditional rendering), but this CSS provides a fallback.
 
 | CSS Selector | What it hides |
 |---|---|
-| `[data-test="scope-selector"]` | The top bar (Program, OrgUnit, Search, Clear selections) |
 | `[data-test="workinglists-template-selector-chips-container"]` | Enrollment tabs (Active, Completed, Cancelled) |
 | `#top-bar-container-list-view-main` | Filter buttons row (Enrollment status, date, etc.) |
 
@@ -56,12 +55,15 @@ A standalone button component that:
 
 ### 4. Modified upstream files (minimal changes)
 
-Only **2 upstream files** have code changes:
+**4 upstream files** have small code changes:
 
 | File | Change | Lines affected |
 |---|---|---|
 | `src/index.tsx` | Added `import './ecraat/ecraat-overrides.css'` | 1 line added |
-| `src/core_modules/capture-core/components/Pages/MainPage/MainPageBody/MainPageBody.component.tsx` | Added import + conditional render of `<EcraatRegisterButton>` | ~5 lines added |
+| `ScopeSelector.component.tsx` | Added ECRAAT early return to render org unit name instead of full selector bar | ~15 lines added (import + conditional block) |
+| `TemplateSelector.component.tsx` | Added early return to hide template tabs | ~4 lines added |
+| `ListViewMain.component.tsx` | Added early return to hide filter/controls bar | ~4 lines added |
+| `MainPageBody.component.tsx` | Added conditional render of `<EcraatRegisterButton>` | ~5 lines added |
 
 ---
 
@@ -70,7 +72,7 @@ Only **2 upstream files** have code changes:
 ```
 src/ecraat/                              ← NEW: All ECRAAT-specific code
 ├── ecraat-config.ts                     ← Feature flags
-├── ecraat-overrides.css                 ← CSS overrides to hide elements
+├── ecraat-overrides.css                 ← CSS backup overrides
 └── index.ts                             ← Re-exports
 
 src/core_modules/capture-core/components/
@@ -78,8 +80,11 @@ src/core_modules/capture-core/components/
     ├── EcraatRegisterButton.component.tsx
     └── index.ts
 
-src/index.tsx                            ← MODIFIED: +1 CSS import
-src/core_modules/.../MainPageBody.component.tsx  ← MODIFIED: +5 lines
+src/index.tsx                                    ← MODIFIED: +1 CSS import
+src/.../ScopeSelector/ScopeSelector.component.tsx ← MODIFIED: +15 lines (org unit name header)
+src/.../WorkingListsBase/TemplateSelector.component.tsx ← MODIFIED: +4 lines
+src/.../ListView/Main/ListViewMain.component.tsx  ← MODIFIED: +4 lines
+src/.../MainPageBody/MainPageBody.component.tsx   ← MODIFIED: +5 lines
 ```
 
 ---
@@ -97,9 +102,14 @@ src/core_modules/.../MainPageBody.component.tsx  ← MODIFIED: +5 lines
    git merge upstream/master
    ```
 
-3. **Resolve conflicts** — the only files likely to conflict are:
-   - `src/index.tsx` → Keep both: upstream imports + our `import './ecraat/ecraat-overrides.css'`
+3. **Resolve conflicts** — files likely to conflict:
+   - `src/index.tsx` → Keep both: upstream imports + our CSS import
+   - `ScopeSelector.component.tsx` → Keep both: upstream code + our early-return block at top of `render()`
+   - `TemplateSelector.component.tsx` → Keep both: upstream code + our early-return
+   - `ListViewMain.component.tsx` → Keep both: upstream code + our early-return
    - `MainPageBody.component.tsx` → Keep both: upstream JSX + our `<EcraatRegisterButton>` block
+
+   **All ECRAAT changes** are clearly marked with `// ECRAAT:` comments, making them easy to identify and re-apply.
 
 4. **New ECRAAT files never conflict** — `src/ecraat/` and `EcraatRegisterButton/` are entirely our own.
 

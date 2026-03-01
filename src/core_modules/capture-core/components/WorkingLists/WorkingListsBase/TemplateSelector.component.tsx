@@ -2,6 +2,8 @@ import * as React from 'react';
 import { withStyles } from 'capture-core-utils/styles';
 import i18n from '@dhis2/d2-i18n';
 import type { WithStyles } from 'capture-core-utils/styles';
+// ECRAAT: Import config to conditionally hide template tabs
+import { ecraatConfig } from '../../../../../ecraat';
 
 import { localeCompareStrings } from '../../../utils/localeCompareStrings';
 import { TemplateSelectorChip } from './TemplateSelectorChip.component';
@@ -99,6 +101,11 @@ const TemplateSelectorPlain = (props: Props) => {
     ), [isExpanded, classes.linkButton]);
 
     if (customTemplates.length <= 0) {
+        return null;
+    }
+
+    // ECRAAT: Hide template tabs when configured
+    if (ecraatConfig.mainPage.hideTemplateTabs) {
         return null;
     }
 

@@ -1,11 +1,14 @@
 import React, { Component } from 'react';
 import { compose } from 'redux';
 import { withStyles, type WithStyles } from 'capture-core-utils/styles';
+import { colors, spacers } from '@dhis2/ui';
 import { QuickSelector } from './QuickSelector/QuickSelector.component';
 import { DiscardDialog } from '../Dialogs/DiscardDialog.component';
 import { defaultDialogProps } from '../Dialogs/DiscardDialog.constants';
 import type { Props, State } from './ScopeSelector.types';
 import { withLoadingIndicator } from '../../HOC';
+// ECRAAT: Import config to conditionally hide the scope selector
+import { ecraatConfig } from '../../../../ecraat';
 
 const styles = {
     stickyTopBar: {
@@ -13,6 +16,15 @@ const styles = {
         top: 0,
         zIndex: 1000,
         width: '100%',
+    },
+    // ECRAAT: Style for the org unit name header shown when scope selector is hidden
+    ecraatOrgUnitHeader: {
+        padding: `${spacers.dp12} ${spacers.dp16}`,
+        fontSize: '15px',
+        fontWeight: 500,
+        color: colors.grey900,
+        backgroundColor: colors.white,
+        borderBottom: `1px solid ${colors.grey300}`,
     },
 } as const;
 
@@ -101,6 +113,26 @@ class ScopeSelectorClass extends Component<Props & WithStyles<typeof styles>, St
             onSetCategoryOption,
             onResetAllCategoryOptions,
         } = this.props;
+
+        // ECRAAT: When scope selector is hidden, show only the org unit name
+        if (ecraatConfig.mainPage.hideScopeSelector) {
+            const orgUnitName = this.props.selectedOrgUnit?.name;
+            return (
+                <div
+                    className={this.props.classes.stickyTopBar}
+                    data-test={'scope-selector'}
+                >
+                    {orgUnitName && (
+                        <div
+                            className={this.props.classes.ecraatOrgUnitHeader}
+                            data-test={'ecraat-org-unit-header'}
+                        >
+                            {orgUnitName}
+                        </div>
+                    )}
+                </div>
+            );
+        }
 
         return (
             <div
