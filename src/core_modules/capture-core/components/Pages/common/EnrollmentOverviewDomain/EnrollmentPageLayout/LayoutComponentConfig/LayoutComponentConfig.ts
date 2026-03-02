@@ -136,6 +136,7 @@ export const EnrollmentNote: WidgetConfig = {
 
 export const ProfileWidget: WidgetConfig = {
     Component: WidgetProfile,
+    shouldHideWidget: ({ hideWidgets }: any) => hideWidgets?.profileWidget,
     getCustomSettings: ({ readOnlyMode = true }: any) => ({
         readOnlyMode,
     }),

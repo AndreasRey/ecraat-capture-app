@@ -49,3 +49,9 @@
 [data-test="widget-enrollment"] {
     display: none !important;
 }
+
+/* ─── 8. Hide Profile widget card (backup for code-level hiding) ─── */
+[data-test="profile-widget"]:not([data-test="profile-widget-actions-only"]) {
+    /* Profile widget is hidden via shouldHideWidget in LayoutComponentConfig.ts.
+       Actions are rendered via actionsOnly prop in the breadcrumb header. */
+}

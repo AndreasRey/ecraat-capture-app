@@ -55,5 +55,33 @@ export const ecraatConfig = {
 
         /** Hide the Enrollment widget (status, dates, org unit, actions) */
         hideEnrollmentWidget: true,
+
+        /** Hide the Profile widget card from the right column */
+        hideProfileWidget: true,
+
+        /** Show the Profile Edit + overflow buttons in the breadcrumb header area */
+        showProfileActionsInHeader: true,
+
+        /**
+         * Center the page content when no meaningful side column is visible.
+         * When true, the right column is suppressed and the left column is
+         * centered with a max-width constraint.
+         */
+        centerContent: true,
+    },
+
+    /**
+     * Breadcrumb customizations
+     */
+    breadcrumb: {
+        /** Custom label to replace "Program overview" in the breadcrumb */
+        mainPageLabel: 'Sector/Building list',
+
+        /**
+         * TEI attribute ID whose value will replace "Enrollment dashboard"
+         * in the breadcrumb. Set to null to keep the default label.
+         * e.g. 'ORpKveoai1g' → shows "Main building" (= the value of that attribute)
+         */
+        enrollmentDashboardAttributeId: 'ORpKveoai1g',
     },
 };

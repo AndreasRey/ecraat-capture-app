@@ -5,6 +5,8 @@ import { useWidgetColumns } from './hooks/useWidgetColumns';
 import { AddRelationshipRefWrapper } from './AddRelationshipRefWrapper';
 import type { Props as EnrollmentPageProps } from '../../../Enrollment/EnrollmentPageDefault/EnrollmentPageDefault.types';
 import { EnrollmentBreadcrumb } from '../../../../Breadcrumbs/EnrollmentBreadcrumb';
+import { WidgetProfile } from '../../../../WidgetProfile';
+import { ecraatConfig } from '../../../../../../../ecraat';
 import './enrollmentPageLayout.css';
 
 const getEnrollmentPageStyles: Readonly<any> = () => ({
@@ -99,6 +101,10 @@ const EnrollmentPageLayoutPlain = ({
         props: allProps,
     });
 
+    // ECRAAT: center content when all right-column widgets are hidden
+    const centeredLayout = !!ecraatConfig.enrollmentDashboard.centerContent;
+    const hasRightColumn = !centeredLayout && pageLayout.rightColumn && !!rightColumnWidgets?.length;
+
     const containerStyle = useMemo(() => {
         if (!pageLayout.backgroundColor || !isValidHex(pageLayout.backgroundColor)) return undefined;
         return { backgroundColor: pageLayout.backgroundColor };
@@ -113,9 +119,12 @@ const EnrollmentPageLayoutPlain = ({
             <AddRelationshipRefWrapper setRelationshipRef={setAddRelationshipContainerElement} />
             <div
                 className={classes.contentContainer}
-                style={!mainContentVisible ? { display: 'none' } : undefined}
+                style={{
+                    ...(!mainContentVisible ? { display: 'none' } : undefined),
+                    ...(centeredLayout ? { maxWidth: 900, margin: '0 auto', width: '100%' } : undefined),
+                }}
             >
-                <div>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <EnrollmentBreadcrumb
                         page={currentPage}
                         onBackToMainPage={onBackToMainPage}
@@ -126,14 +135,29 @@ const EnrollmentPageLayoutPlain = ({
                         userInteractionInProgress={userInteractionInProgress}
                         eventStatus={eventStatus}
                     />
+                    {/* ECRAAT: Profile Edit + overflow actions in the breadcrumb header */}
+                    {ecraatConfig.enrollmentDashboard.showProfileActionsInHeader && (
+                        <WidgetProfile
+                            teiId={(passOnProps as any).teiId}
+                            programId={program.id}
+                            orgUnitId={(passOnProps as any).orgUnitId}
+                            onUpdateTeiAttributeValues={(passOnProps as any).onUpdateTeiAttributeValues}
+                            onDeleteSuccess={(passOnProps as any).onDeleteTrackedEntitySuccess}
+                            actionsOnly
+                        />
+                    )}
                 </div>
-                <div className={classes.columns}>
+                <div className={classes.columns} style={centeredLayout ? { justifyContent: 'center' } : undefined}>
                     {pageLayout.leftColumn && !!leftColumnWidgets?.length && (
-                        <div id="left-column-enrollment-page-layout" className={classes.leftColumn}>
+                        <div
+                            id="left-column-enrollment-page-layout"
+                            className={classes.leftColumn}
+                            style={centeredLayout ? { minWidth: 'unset', flexBasis: 'auto', width: '100%' } : undefined}
+                        >
                             {leftColumnWidgets}
                         </div>
                     )}
-                    {pageLayout.rightColumn && !!rightColumnWidgets?.length && (
+                    {hasRightColumn && (
                         <div id="right-column-enrollment-page-layout" className={classes.rightColumn}>
                             {rightColumnWidgets}
                         </div>

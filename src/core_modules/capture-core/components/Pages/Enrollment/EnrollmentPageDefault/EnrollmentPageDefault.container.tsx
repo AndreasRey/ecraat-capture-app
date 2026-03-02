@@ -102,6 +102,7 @@ export const EnrollmentPageDefault = () => {
         quickActions: ecraatConfig.enrollmentDashboard.hideQuickActions || ruleHideWidgets?.quickActions,
         enrollmentNote: ecraatConfig.enrollmentDashboard.hideEnrollmentNotes || ruleHideWidgets?.enrollmentNote,
         enrollmentWidget: ecraatConfig.enrollmentDashboard.hideEnrollmentWidget || ruleHideWidgets?.enrollmentWidget,
+        profileWidget: ecraatConfig.enrollmentDashboard.hideProfileWidget || ruleHideWidgets?.profileWidget,
     };
 
     const onDeleteTrackedEntitySuccess = useCallback(() => {

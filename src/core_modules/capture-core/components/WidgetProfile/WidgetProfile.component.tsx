@@ -58,6 +58,7 @@ const WidgetProfilePlain = ({
     teiId,
     programId,
     readOnlyMode = false,
+    actionsOnly = false,
     orgUnitId = '',
     onUpdateTeiAttributeValues,
     onDeleteSuccess,
@@ -171,12 +172,61 @@ const WidgetProfilePlain = ({
     const handleOnDisable = useCallback(() => setTeiModalState(TEI_MODAL_STATE.OPEN_DISABLE), [setTeiModalState]);
     const handleOnEnable = useCallback(() => setTeiModalState(TEI_MODAL_STATE.OPEN), [setTeiModalState]);
 
+    // ECRAAT: compact mode — render only Edit + overflow buttons (no card/widget wrapper)
+    if (actionsOnly) {
+        return (
+            <div data-test="profile-widget-actions-only" style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
+                {isEditable && (
+                    <Button onClick={() => setTeiModalState(TEI_MODAL_STATE.OPEN)} secondary small>
+                        {i18n.t('Edit')}
+                    </Button>
+                )}
+                <OverflowMenu
+                    trackedEntityTypeName={trackedEntityTypeName}
+                    canWriteData={canWriteData}
+                    trackedEntity={trackedEntity ?
+                        { trackedEntity: trackedEntity.trackedEntity || teiId } :
+                        { trackedEntity: teiId }
+                    }
+                    onDeleteSuccess={onDeleteSuccess}
+                    displayChangelog={!!displayChangelog}
+                    trackedEntityData={clientAttributesWithSubvalues}
+                    teiId={teiId}
+                    programAPI={program}
+                    readOnlyMode={readOnlyMode || false}
+                />
+                {showEditModal(loading, error, isEditable, modalState, program) && (
+                    <>
+                        <DataEntry
+                            onCancel={() => setTeiModalState(TEI_MODAL_STATE.CLOSE)}
+                            onDisable={handleOnDisable}
+                            onEnable={handleOnEnable}
+                            programAPI={program}
+                            dataEntryFormConfig={dataEntryFormConfig}
+                            orgUnitId={orgUnitId}
+                            clientAttributesWithSubvalues={clientAttributesWithSubvalues}
+                            userRoles={userRoles}
+                            trackedEntityInstanceId={teiId}
+                            onSaveSuccessActionType={dataEntryActionTypes.TEI_UPDATE_SUCCESS}
+                            onSaveErrorActionType={dataEntryActionTypes.TEI_UPDATE_ERROR}
+                            onSaveExternal={onSaveExternal}
+                            modalState={modalState}
+                            geometry={geometry}
+                            trackedEntityName={trackedEntityTypeName}
+                        />
+                        <NoticeBox formId="trackedEntityProfile-edit" />
+                    </>
+                )}
+            </div>
+        );
+    }
+
     return (
         <div data-test="profile-widget">
             <Widget
                 header={
                     <div className={classes.header}>
-                        <div>
+                        <div data-test="profile-widget-title">
                             {trackedEntityTypeName
                                 ? i18n.t('{{trackedEntityTypeName}} profile', {
                                     trackedEntityTypeName,
@@ -184,7 +234,7 @@ const WidgetProfilePlain = ({
                                 })
                                 : i18n.t('Profile')}
                         </div>
-                        <div className={classes.actions}>
+                        <div className={classes.actions} data-test="profile-widget-actions">
                             {isEditable && (
                                 <Button onClick={() => setTeiModalState(TEI_MODAL_STATE.OPEN)} secondary small>
                                     {i18n.t('Edit')}

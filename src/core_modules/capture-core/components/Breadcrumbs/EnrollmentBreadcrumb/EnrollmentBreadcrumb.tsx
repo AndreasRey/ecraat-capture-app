@@ -1,5 +1,6 @@
 import React, { useCallback, useMemo, useState, ComponentType } from 'react';
 import i18n from '@dhis2/d2-i18n';
+import { useSelector } from 'react-redux';
 import { withStyles, WithStyles } from 'capture-core-utils/styles';
 import { colors } from '@dhis2/ui';
 import { DirectionalChevron } from '../../../utils/rtl';
@@ -10,6 +11,7 @@ import { DiscardDialog } from '../../Dialogs/DiscardDialog.component';
 import {
     EnrollmentPageKeys,
 } from '../../Pages/common/EnrollmentOverviewDomain/EnrollmentPageLayout/DefaultEnrollmentLayout.constants';
+import { ecraatConfig } from '../../../../../ecraat';
 
 type EnrollmentPageKeyTypes = typeof EnrollmentPageKeys[keyof typeof EnrollmentPageKeys];
 
@@ -69,10 +71,24 @@ const BreadcrumbsPlain = ({
 }: Props) => {
     const [openWarning, setOpenWarning] = useState<WarningKey | null>(null);
 
-    const { label } = useWorkingListLabel({
+    const { label: workingListLabel } = useWorkingListLabel({
         programId,
         displayFrontPageList,
     });
+
+    // ECRAAT: override breadcrumb labels
+    const label = ecraatConfig.breadcrumb.mainPageLabel || workingListLabel;
+
+    const attributeValues: Array<{ id: string; value: string }> | undefined =
+        useSelector((state: any) => state.enrollmentDomain?.attributeValues);
+    const enrollmentDashboardLabel = useMemo(() => {
+        const attrId = ecraatConfig.breadcrumb.enrollmentDashboardAttributeId;
+        if (attrId && attributeValues) {
+            const attr = attributeValues.find((a: any) => a.id === attrId);
+            if (attr?.value) return attr.value;
+        }
+        return i18n.t('Enrollment dashboard');
+    }, [attributeValues]);
 
     const handleNavigation = useCallback((callback?: () => void, warningType?: WarningKey) => {
         if (userInteractionInProgress && warningType) {
@@ -101,7 +117,7 @@ const BreadcrumbsPlain = ({
         {
             key: pageKeys.OVERVIEW,
             onClick: () => handleNavigation(onBackToDashboard, pageKeys.OVERVIEW),
-            label: i18n.t('Enrollment dashboard'),
+            label: enrollmentDashboardLabel,
             selected: page === pageKeys.OVERVIEW,
             condition: true,
         },
@@ -129,6 +145,7 @@ const BreadcrumbsPlain = ({
         },
     ] as BreadcrumbItemType[]).filter((item): item is BreadcrumbItemType => item.condition), [
         label,
+        enrollmentDashboardLabel,
         page,
         eventStatus,
         handleNavigation,
