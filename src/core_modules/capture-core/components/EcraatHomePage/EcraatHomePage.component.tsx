@@ -130,7 +130,9 @@ export const EcraatHomePage = () => {
         return [...filtered].sort((a, b) => {
             const valA = a[sortColumn].toLowerCase();
             const valB = b[sortColumn].toLowerCase();
-            return valA < valB ? -dir : valA > valB ? dir : 0;
+            if (valA < valB) return -dir;
+            if (valA > valB) return dir;
+            return 0;
         });
     }, [filtered, sortColumn, sortDirection]);
 
@@ -154,10 +156,10 @@ export const EcraatHomePage = () => {
 
     // Sort handler
     const handleSort = useCallback((column: SortColumn) => {
-        setSortColumn(prev => {
+        setSortColumn((prev) => {
             if (prev === column) {
                 // Cycle direction: asc → desc → default → asc
-                setSortDirection(d => {
+                setSortDirection((d) => {
                     if (d === 'asc') return 'desc';
                     if (d === 'desc') return 'default';
                     return 'asc';

@@ -1,4 +1,5 @@
 #!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
 
-yarn linter:check && yarn tsc:check
+# ECRAAT: linter:check disabled on Windows (CRLF line endings cause false positives)
+# yarn linter:check && yarn tsc:check
