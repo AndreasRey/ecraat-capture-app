@@ -40,4 +40,20 @@ export const ecraatConfig = {
         /** Show a "+" icon prefix on the register button */
         registerButtonShowPlusIcon: true,
     },
+
+    /**
+     * Enrollment Dashboard customizations
+     * Uses the upstream `shouldHideWidget` pattern in LayoutComponentConfig.ts
+     * and merges flags into the `hideWidgets` prop in EnrollmentPageDefault.container.tsx.
+     */
+    enrollmentDashboard: {
+        /** Hide the Quick Actions widget (New event / Schedule an event) */
+        hideQuickActions: true,
+
+        /** Hide the Notes about this enrollment widget */
+        hideEnrollmentNotes: true,
+
+        /** Hide the Enrollment widget (status, dates, org unit, actions) */
+        hideEnrollmentWidget: true,
+    },
 };

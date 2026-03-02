@@ -33,6 +33,7 @@ import {
     useEnrollmentPageLayout,
 } from '../../common/EnrollmentOverviewDomain/EnrollmentPageLayout/hooks/useEnrollmentPageLayout';
 import { DefaultPageLayout, WidgetsForEnrollmentPageDefault } from './DefaultPageLayout';
+import { ecraatConfig } from '../../../../../../ecraat';
 import { LoadingMaskForPage } from '../../../LoadingMasks';
 import {
     EnrollmentPageKeys,
@@ -94,7 +95,14 @@ export const EnrollmentPageDefault = () => {
     });
 
     const outputEffects = useFilteredWidgetData(ruleEffects);
-    const hideWidgets = useHideWidgetByRuleLocations(program.programRules);
+    const ruleHideWidgets = useHideWidgetByRuleLocations(program.programRules);
+    // ECRAAT: merge config-driven widget hiding with rule-driven hiding
+    const hideWidgets = {
+        ...ruleHideWidgets,
+        quickActions: ecraatConfig.enrollmentDashboard.hideQuickActions || ruleHideWidgets?.quickActions,
+        enrollmentNote: ecraatConfig.enrollmentDashboard.hideEnrollmentNotes || ruleHideWidgets?.enrollmentNote,
+        enrollmentWidget: ecraatConfig.enrollmentDashboard.hideEnrollmentWidget || ruleHideWidgets?.enrollmentWidget,
+    };
 
     const onDeleteTrackedEntitySuccess = useCallback(() => {
         navigate(`/?${buildUrlQueryString({ orgUnitId, programId })}`);

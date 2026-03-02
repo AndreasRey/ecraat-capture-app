@@ -35,16 +35,26 @@ export const ecraatConfig = {
 
 **To disable any customization**, just set the flag to `false` — no other file changes needed for CSS-based overrides.
 
-### 2. `src/ecraat/ecraat-overrides.css` — CSS backup for element hiding
+### 2. `src/ecraat/ecraat-overrides.css` — CSS element hiding (backup)
 
-A safety-net CSS file using `data-test` attributes and HTML `id`s to hide elements. The **primary** hiding mechanism is code-level (conditional rendering), but this CSS provides a fallback.
+Uses `data-test` attributes and HTML `id`s to hide elements. Acts as a **safety net** for the code-level hiding. All primary hiding is done via code (conditional returns / `shouldHideWidget` callbacks).
 
-| CSS Selector | What it hides |
-|---|---|
-| `[data-test="workinglists-template-selector-chips-container"]` | Enrollment tabs (Active, Completed, Cancelled) |
-| `#top-bar-container-list-view-main` | Filter buttons row (Enrollment status, date, etc.) |
+| CSS Selector | What it hides | Page |
+|---|---|---|
+| `[data-test="workinglists-template-selector-chips-container"]` | Enrollment tabs (Active, Completed, Cancelled) | Main |
+| `#top-bar-container-list-view-main` | Filter buttons row (Enrollment status, date, etc.) | Main |
+| `[data-test="widget-quick-actions"]` | Quick Actions widget (New event / Schedule) | Enrollment Dashboard |
+| `[data-test="enrollment-note-widget"]` | Notes about this enrollment widget | Enrollment Dashboard |
+| `[data-test="widget-enrollment"]` | Enrollment widget (status, dates, actions) | Enrollment Dashboard |
 
 **Imported once** in `src/index.tsx`.
+
+### 2b. Enrollment Dashboard — Code-level widget hiding
+
+The enrollment dashboard uses DHIS2's `shouldHideWidget` pattern (already used for FeedbackWidget / IndicatorWidget):
+
+1. **`LayoutComponentConfig.ts`** — `shouldHideWidget` callbacks added to `QuickActions`, `EnrollmentNote`, and `EnrollmentWidget` configs. Each checks `hideWidgets?.quickActions`, `hideWidgets?.enrollmentNote`, `hideWidgets?.enrollmentWidget`.
+2. **`EnrollmentPageDefault.container.tsx`** — merges ECRAAT config flags into the `hideWidgets` object alongside existing rule-based hiding.
 
 ### 3. `src/core_modules/capture-core/components/EcraatRegisterButton/` — Register button
 
@@ -55,15 +65,18 @@ A standalone button component that:
 
 ### 4. Modified upstream files (minimal changes)
 
-**4 upstream files** have small code changes:
+**8 upstream files** have small code changes:
 
 | File | Change | Lines affected |
 |---|---|---|
 | `src/index.tsx` | Added `import './ecraat/ecraat-overrides.css'` | 1 line added |
-| `ScopeSelector.component.tsx` | Added ECRAAT early return to render org unit name instead of full selector bar | ~15 lines added (import + conditional block) |
+| `ScopeSelector.component.tsx` | Added ECRAAT early return to render org unit name instead of full selector bar | ~15 lines added |
 | `TemplateSelector.component.tsx` | Added early return to hide template tabs | ~4 lines added |
 | `ListViewMain.component.tsx` | Added early return to hide filter/controls bar | ~4 lines added |
 | `MainPageBody.component.tsx` | Added conditional render of `<EcraatRegisterButton>` | ~5 lines added |
+| `EnrollmentQuickActions.component.tsx` | Wrapped return in `data-test` div for CSS targeting | ~2 lines added |
+| `LayoutComponentConfig.ts` | Added `shouldHideWidget` callbacks to QuickActions, EnrollmentNote, EnrollmentWidget | ~3 lines added |
+| `EnrollmentPageDefault.container.tsx` | Merged ECRAAT config flags into `hideWidgets` object | ~8 lines added |
 
 ---
 
@@ -71,8 +84,8 @@ A standalone button component that:
 
 ```
 src/ecraat/                              ← NEW: All ECRAAT-specific code
-├── ecraat-config.ts                     ← Feature flags
-├── ecraat-overrides.css                 ← CSS backup overrides
+├── ecraat-config.ts                     ← Feature flags (main page + enrollment dashboard)
+├── ecraat-overrides.css                 ← CSS overrides to hide elements
 └── index.ts                             ← Re-exports
 
 src/core_modules/capture-core/components/
@@ -85,6 +98,9 @@ src/.../ScopeSelector/ScopeSelector.component.tsx ← MODIFIED: +15 lines (org u
 src/.../WorkingListsBase/TemplateSelector.component.tsx ← MODIFIED: +4 lines
 src/.../ListView/Main/ListViewMain.component.tsx  ← MODIFIED: +4 lines
 src/.../MainPageBody/MainPageBody.component.tsx   ← MODIFIED: +5 lines
+src/.../EnrollmentQuickActions.component.tsx      ← MODIFIED: +2 lines (data-test wrapper)
+src/.../LayoutComponentConfig/LayoutComponentConfig.ts ← MODIFIED: +3 lines (shouldHideWidget)
+src/.../EnrollmentPageDefault.container.tsx         ← MODIFIED: +8 lines (hideWidgets merge)
 ```
 
 ---
@@ -108,6 +124,8 @@ src/.../MainPageBody/MainPageBody.component.tsx   ← MODIFIED: +5 lines
    - `TemplateSelector.component.tsx` → Keep both: upstream code + our early-return
    - `ListViewMain.component.tsx` → Keep both: upstream code + our early-return
    - `MainPageBody.component.tsx` → Keep both: upstream JSX + our `<EcraatRegisterButton>` block
+   - `LayoutComponentConfig.ts` → Keep both: upstream widget configs + add `shouldHideWidget` to QuickActions, EnrollmentNote, EnrollmentWidget
+   - `EnrollmentPageDefault.container.tsx` → Keep both: upstream code + our `hideWidgets` merge block
 
    **All ECRAAT changes** are clearly marked with `// ECRAAT:` comments, making them easy to identify and re-apply.
 

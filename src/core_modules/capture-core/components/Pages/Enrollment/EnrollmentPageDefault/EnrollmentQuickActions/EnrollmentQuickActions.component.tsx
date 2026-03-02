@@ -62,6 +62,8 @@ const EnrollmentQuickActionsComponentPlain = ({
     const ready: boolean = events !== undefined && stages !== undefined;
 
     return (
+        // ECRAAT: wrapper div with data-test for CSS targeting
+        <div data-test="widget-quick-actions">
         <Widget
             header={i18n.t('Quick actions')}
             open={open}
@@ -100,6 +102,7 @@ const EnrollmentQuickActionsComponentPlain = ({
                 </div>
             )}
         </Widget>
+        </div>
     );
 };
 

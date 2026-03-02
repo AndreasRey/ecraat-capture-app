@@ -39,6 +39,7 @@ import {
 
 export const QuickActions: WidgetConfig = {
     Component: EnrollmentQuickActions,
+    shouldHideWidget: ({ hideWidgets }: any) => hideWidgets?.quickActions,
     getProps: ({ stages, events, ruleEffects }: any) => ({
         stages,
         events,
@@ -129,6 +130,7 @@ export const IndicatorWidget: WidgetConfig = {
 
 export const EnrollmentNote: WidgetConfig = {
     Component: WidgetEnrollmentNote,
+    shouldHideWidget: ({ hideWidgets }: any) => hideWidgets?.enrollmentNote,
     getProps: () => ({}),
 };
 
@@ -181,7 +183,7 @@ export const NewEventWorkspace: WidgetConfig = {
 
 export const EnrollmentWidget: WidgetConfig = {
     Component: WidgetEnrollment,
-    shouldHideWidget: ({ enrollmentId }: any) => enrollmentId === 'AUTO',
+    shouldHideWidget: ({ enrollmentId, hideWidgets }: any) => enrollmentId === 'AUTO' || hideWidgets?.enrollmentWidget,
     getCustomSettings: ({ readOnlyMode }: any) => ({
         readOnlyMode,
     }),
