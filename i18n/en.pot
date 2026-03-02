@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2026-03-01T10:48:02.957Z\n"
-"PO-Revision-Date: 2026-03-01T10:48:02.958Z\n"
+"POT-Creation-Date: 2026-03-02T09:35:04.980Z\n"
+"PO-Revision-Date: 2026-03-02T09:35:04.980Z\n"
 
 msgid "The application could not be loaded."
 msgstr "The application could not be loaded."
@@ -434,6 +434,47 @@ msgid ""
 msgstr ""
 "This event has unsaved changes. Leaving this page without saving will lose "
 "these changes. Are you sure you want to discard unsaved changes?"
+
+msgid "Error loading organisation units"
+msgstr "Error loading organisation units"
+
+msgid "Detention places"
+msgstr "Detention places"
+
+msgid "Search by name"
+msgstr "Search by name"
+
+msgid "Type to search…"
+msgstr "Type to search…"
+
+msgid "Filter by region"
+msgstr "Filter by region"
+
+msgid "All regions"
+msgstr "All regions"
+
+msgid "Sort by name"
+msgstr "Sort by name"
+
+msgid "Sort by region"
+msgstr "Sort by region"
+
+msgid "Region"
+msgstr "Region"
+
+msgid "No organisation units match your filters"
+msgstr "No organisation units match your filters"
+
+msgid "No organisation units found"
+msgstr "No organisation units found"
+
+msgid "Open"
+msgstr "Open"
+
+msgid "Showing {{count}} of {{total}} organisation units"
+msgid_plural "Showing {{count}} of {{total}} organisation units"
+msgstr[0] "Showing {{count}} of {{total}} organisation units"
+msgstr[1] "Showing {{count}} of {{total}} organisation units"
 
 msgid "No events to display"
 msgstr "No events to display"

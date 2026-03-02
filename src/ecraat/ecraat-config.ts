@@ -19,6 +19,21 @@
 
 export const ecraatConfig = {
     /**
+     * Home Page — replaces the default "Get started" splash screen
+     * with a filterable table of organisation units for the program.
+     */
+    homePage: {
+        /** Show the custom OrgUnit table instead of the default splash */
+        enabled: true,
+
+        /** Program ID whose org units populate the table */
+        programId: 'Bi1Zu6UjfmG',
+
+        /** Template ID appended to navigation links (set null to omit) */
+        defaultTemplateId: 'Bi1Zu6UjfmG-default',
+    },
+
+    /**
      * Main Page customizations
      */
     mainPage: {

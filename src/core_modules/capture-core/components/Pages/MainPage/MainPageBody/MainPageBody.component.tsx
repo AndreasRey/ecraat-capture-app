@@ -19,8 +19,9 @@ import {
 } from './InvalidCategoryCombinationForOrgUnitMessage/InvalidCategoryCombinationForOrgUnitMessage';
 import { NoSelectionsInfoBox } from './NoSelectionsInfoBox';
 import './mainPageBody.css';
-// ECRAAT: Import register button and config
+// ECRAAT: Import register button, home page and config
 import { EcraatRegisterButton } from '../../../EcraatRegisterButton';
+import { EcraatHomePage } from '../../../EcraatHomePage';
 import { ecraatConfig } from '../../../../../../ecraat';
 
 const styles: Readonly<any> = {
@@ -99,7 +100,9 @@ const MainPageBodyPlain = ({
             {showMainPage ? (
                 <>
                     {mainPageStatus === MainPageStatuses.DEFAULT && (
-                        <NoSelectionsInfoBox />
+                        ecraatConfig.homePage.enabled
+                            ? <EcraatHomePage />
+                            : <NoSelectionsInfoBox />
                     )}
                     {mainPageStatus === MainPageStatuses.WITHOUT_ORG_UNIT_SELECTED && (
                         <WithoutOrgUnitSelectedMessage programId={programId} setShowAccessible={setShowAccessible} />
