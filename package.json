@@ -1,13 +1,10 @@
 {
-    "name": "capture-app",
+    "name": "ecraat-data-capture",
     "homepage": ".",
-    "version": "105.7.0",
+    "version": "1.0.0",
     "cacheVersion": "2",
     "license": "BSD-3-Clause",
     "private": true,
-    "workspaces": [
-        "packages/rules-engine"
-    ],
     "dependencies": {
         "@dhis2-ui/calendar": "^10.7.6",
         "@dhis2/rules-engine-javascript": "105.7.0",
@@ -66,7 +63,7 @@
         "start": "yarn verifyCacheVersion && concurrently --kill-others \"yarn workspaces run build:watch\" \"d2-app-scripts start\"",
         "start:prod": "yarn build:standalone && serve -s build/app",
         "start:forCypress": "yarn build:standalone && node scripts/startAppForCypress.js",
-        "build": "yarn verifyCacheVersion && yarn workspaces run build && GENERATE_SOURCEMAP=false d2-app-scripts build && cp ./package.json ./build/app/package.json",
+        "build": "d2-app-scripts build",
         "build:standalone": "yarn verifyCacheVersion && yarn workspaces run build && GENERATE_SOURCEMAP=false d2-app-scripts build --standalone",
         "test": "yarn workspaces run build && d2-app-scripts test",
         "test:debug": "yarn workspaces run build && react-scripts --inspect-brk test --runInBand",
