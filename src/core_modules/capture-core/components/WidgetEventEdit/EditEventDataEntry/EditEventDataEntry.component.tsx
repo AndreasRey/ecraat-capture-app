@@ -52,6 +52,7 @@ import {
 import { systemSettingsStore } from '../../../metaDataMemoryStores';
 import { getOrgUnitValidatorContainers } from '../DataEntry/fieldValidators';
 import type { UserFormField } from '../../FormFields/UserField';
+import { ecraatConfig } from '../../../../../ecraat';
 
 const tabMode = Object.freeze({
     REPORT: 'REPORT',
@@ -415,7 +416,10 @@ const saveHandlerConfig = {
 const AOCFieldBuilderHOC = withAOCFieldBuilder({})(withDataEntryFields(getCategoryOptionsSettingsFn())(DataEntry));
 const CleanUpHOC = withCleanUp()(AOCFieldBuilderHOC);
 const GeometryField = withDataEntryFieldIfApplicable(buildGeometrySettingsFn())(CleanUpHOC);
-const OrgUnitField = withDataEntryField(buildOrgUnitSettingsFn())(GeometryField);
+const OrgUnitField = withDataEntryFieldIfApplicable({
+    ...buildOrgUnitSettingsFn(),
+    isApplicable: () => !ecraatConfig.eventForm.hideOrgUnitField,
+})(GeometryField);
 const ScheduleDateField = withDataEntryField(buildScheduleDateSettingsFn())(OrgUnitField);
 const ReportDateField = withDataEntryField(buildReportDateSettingsFn())(ScheduleDateField);
 const SaveableDataEntry = withSaveHandler(saveHandlerConfig)(withMainButton()(ReportDateField));
@@ -527,12 +531,14 @@ class EditEventDataEntryPlain extends Component<Props & WithStyles<typeof getSty
                         onClick={() => this.onHandleSwitchTab(tabMode.REPORT)}
                         dataTest="edit-event-report-tab"
                     >{i18n.t('Report')}</Tab>
-                    <Tab
-                        key="schedule-tab"
-                        selected={this.state.mode === tabMode.SCHEDULE}
-                        onClick={() => this.onHandleSwitchTab(tabMode.SCHEDULE)}
-                        dataTest="edit-event-schedule-tab"
-                    >{i18n.t('Schedule')}</Tab>
+                    {!ecraatConfig.eventForm.hideScheduleTab && (
+                        <Tab
+                            key="schedule-tab"
+                            selected={this.state.mode === tabMode.SCHEDULE}
+                            onClick={() => this.onHandleSwitchTab(tabMode.SCHEDULE)}
+                            dataTest="edit-event-schedule-tab"
+                        >{i18n.t('Schedule')}</Tab>
+                    )}
                 </TabBar>
                 {this.state.mode === tabMode.REPORT && this.renderDataEntry()}
                 {this.state.mode === tabMode.SCHEDULE &&

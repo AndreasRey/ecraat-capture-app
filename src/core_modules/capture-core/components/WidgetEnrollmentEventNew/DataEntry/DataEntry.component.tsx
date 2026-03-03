@@ -48,6 +48,7 @@ import {
     getCategoryOptionsValidatorContainers,
 } from '../../DataEntryDhis2Helpers';
 import { systemSettingsStore } from '../../../metaDataMemoryStores';
+import { ecraatConfig } from '../../../../../ecraat';
 
 const getStyles = (theme: any) => ({
     savingContextContainer: {
@@ -409,7 +410,10 @@ const WrappedDataEntry = compose(
     withAOCFieldBuilder({}),
     withDataEntryFields(getCategoryOptionsSettingsFn()),
     withDataEntryField(buildReportDateSettingsFn()),
-    withDataEntryField(buildOrgUnitSettingsFn()),
+    withDataEntryFieldIfApplicable({
+        ...buildOrgUnitSettingsFn(),
+        isApplicable: () => !ecraatConfig.eventForm.hideOrgUnitField,
+    }),
     withDataEntryFieldIfApplicable(buildGeometrySettingsFn()),
     withDataEntryField(buildNotesSettingsFn()),
     withDataEntryFieldIfApplicable(buildAssigneeSettingsFn()),

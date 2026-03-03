@@ -16,6 +16,7 @@ import {
 import type { Props } from './newEventWorkspace.types';
 import { useLocationQuery } from '../../../../utils/routing';
 import { defaultDialogProps } from '../../../Dialogs/DiscardDialog.constants';
+import { ecraatConfig } from '../../../../../../ecraat';
 
 const styles: Readonly<any> = () => ({
     innerWrapper: {
@@ -71,12 +72,14 @@ const NewEventWorkspacePlain = ({
                             onClick={() => onHandleSwitchTab(tabMode.REPORT)}
                             dataTest="new-event-report-tab"
                         >{i18n.t('Report')}</Tab>
-                        <Tab
-                            key="schedule-tab"
-                            selected={mode === tabMode.SCHEDULE}
-                            onClick={() => onHandleSwitchTab(tabMode.SCHEDULE)}
-                            dataTest="new-event-schedule-tab"
-                        >{i18n.t('Schedule')}</Tab>
+                        {!ecraatConfig.eventForm.hideScheduleTab && (
+                            <Tab
+                                key="schedule-tab"
+                                selected={mode === tabMode.SCHEDULE}
+                                onClick={() => onHandleSwitchTab(tabMode.SCHEDULE)}
+                                dataTest="new-event-schedule-tab"
+                            >{i18n.t('Schedule')}</Tab>
+                        )}
                         {/* <Tab
                             key="refer-tab"
                             selected={mode === tabMode.REFER}

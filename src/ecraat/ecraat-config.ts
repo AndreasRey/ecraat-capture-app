@@ -92,6 +92,18 @@ export const ecraatConfig = {
     },
 
     /**
+     * Event Form customizations
+     * Controls visibility of elements in the new/edit event data entry forms.
+     */
+    eventForm: {
+        /** Hide the "Schedule" tab in the new/edit event workspace */
+        hideScheduleTab: true,
+
+        /** Hide the "Organisation unit" field (pre-filled, not editable) */
+        hideOrgUnitField: true,
+    },
+
+    /**
      * Breadcrumb customizations
      */
     breadcrumb: {
