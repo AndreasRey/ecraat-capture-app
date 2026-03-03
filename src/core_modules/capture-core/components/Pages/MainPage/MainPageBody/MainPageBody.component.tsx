@@ -114,7 +114,14 @@ const MainPageBodyPlain = ({
                         <WithoutCategorySelectedMessage programId={programId} />
                     )}
                     {mainPageStatus === MainPageStatuses.SHOW_WORKING_LIST && (
-                        <div className={classes.container} data-test={'main-page-working-list'}>
+                        <div
+                            className={classes.container}
+                            data-test={'main-page-working-list'}
+                            style={ecraatConfig.mainPage.centerContent
+                                ? { maxWidth: 900, margin: '0 auto', width: '100%' }
+                                : undefined
+                            }
+                        >
                             <div className={cx(classes.leftColumn, 'left-column-main-page')}>
                                 {/* ECRAAT: Show register button above the working list */}
                                 {ecraatConfig.mainPage.hideScopeSelector && (

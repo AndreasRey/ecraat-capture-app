@@ -30,7 +30,7 @@ export const StagesPlain = ({ stages, events, ...passOnProps }: PlainProps) => {
     return (<>
         {
             stages
-                .filter(stage => stage.dataAccess.read)
+                .filter(stage => stage.dataAccess.read && stage.dataAccess.write)
                 .map(stage => (
                     <Stage
                         events={eventsByStage[stage.id]}

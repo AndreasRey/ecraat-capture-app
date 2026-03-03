@@ -25,6 +25,7 @@ const styles = {
         color: colors.grey900,
         backgroundColor: colors.white,
         borderBottom: `1px solid ${colors.grey300}`,
+        textAlign: 'center',
     },
 } as const;
 

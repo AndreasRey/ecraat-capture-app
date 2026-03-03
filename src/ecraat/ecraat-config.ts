@@ -54,6 +54,12 @@ export const ecraatConfig = {
 
         /** Show a "+" icon prefix on the register button */
         registerButtonShowPlusIcon: true,
+
+        /**
+         * Center the working list content with a max-width constraint
+         * to match the narrower, centered enrollment dashboard layout.
+         */
+        centerContent: true,
     },
 
     /**
