@@ -6,6 +6,7 @@ import type { Props } from './stage.types';
 import { Widget } from '../../../Widget';
 import { StageDetail } from './StageDetail/StageDetail.component';
 import { StageCreateNewButton } from './StageCreateNewButton';
+import { StageReplicateButton } from './StageReplicateButton';
 
 const styles = {
     overview: {
@@ -67,14 +68,23 @@ export const StagePlain = ({
                     {...passOnProps}
                 /> : (
                     <div className={classes.buttonContainer}>
-                        <StageCreateNewButton
-                            onCreateNew={() => onCreateNew(id)}
-                            stageWriteAccess={stage.dataAccess.write}
-                            eventCount={events.length}
-                            repeatable={repeatable}
-                            preventAddingEventActionInEffect={preventAddingNewEvents}
-                            eventName={name}
-                        />
+                        <div className={classes.buttonRow}>
+                            <StageCreateNewButton
+                                onCreateNew={() => onCreateNew(id)}
+                                stageWriteAccess={stage.dataAccess.write}
+                                eventCount={events.length}
+                                repeatable={repeatable}
+                                preventAddingEventActionInEffect={preventAddingNewEvents}
+                                eventName={name}
+                            />
+                            <div style={{ marginLeft: 8 }}>
+                                <StageReplicateButton
+                                    events={events}
+                                    eventName={name}
+                                    stageWriteAccess={stage.dataAccess.write}
+                                />
+                            </div>
+                        </div>
                     </div>
                 )}
             </Widget>

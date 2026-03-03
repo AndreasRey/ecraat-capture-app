@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2026-03-02T09:35:04.980Z\n"
-"PO-Revision-Date: 2026-03-02T09:35:04.980Z\n"
+"POT-Creation-Date: 2026-03-03T06:19:08.197Z\n"
+"PO-Revision-Date: 2026-03-03T06:19:08.198Z\n"
 
 msgid "The application could not be loaded."
 msgstr "The application could not be loaded."
@@ -1774,8 +1774,8 @@ msgstr "You do not have access to create events in this stage"
 msgid "This stage can only have one event"
 msgstr "This stage can only have one event"
 
-msgid "New {{ eventName }} event"
-msgstr "New {{ eventName }} event"
+msgid "New blank {{ eventName }} event"
+msgstr "New blank {{ eventName }} event"
 
 msgid "{{occurredAt}} belongs to an expired period. Event cannot be deleted"
 msgstr "{{occurredAt}} belongs to an expired period. Event cannot be deleted"
@@ -1814,6 +1814,18 @@ msgstr "{{ overdueEvents }} overdue"
 
 msgid "{{ scheduledEvents }} scheduled"
 msgstr "{{ scheduledEvents }} scheduled"
+
+msgid "The date must be after {{ minDate }}"
+msgstr "The date must be after {{ minDate }}"
+
+msgid "Cannot replicate"
+msgstr "Cannot replicate"
+
+msgid "Replicate last {{ eventName }} event"
+msgstr "Replicate last {{ eventName }} event"
+
+msgid "Confirm replication"
+msgstr "Confirm replication"
 
 msgid "Stages and Events"
 msgstr "Stages and Events"

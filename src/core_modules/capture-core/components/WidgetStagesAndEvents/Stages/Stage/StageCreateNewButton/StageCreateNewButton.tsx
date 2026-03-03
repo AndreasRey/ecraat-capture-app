@@ -65,7 +65,7 @@ export const StageCreateNewButton = ({
                 dataTest={'create-new-button'}
                 disabled={isDisabled}
             >
-                {i18n.t('New {{ eventName }} event', {
+                {i18n.t('New blank {{ eventName }} event', {
                     eventName, interpolation: { escapeValue: false },
                 })}
             </Button>

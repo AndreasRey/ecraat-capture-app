@@ -20,6 +20,7 @@ import log from 'loglevel';
 import { errorCreator } from 'capture-core-utils';
 import { sortDataFromEvent } from './hooks/sortFunctions';
 import { StageCreateNewButton } from '../StageCreateNewButton';
+import { StageReplicateButton } from '../StageReplicateButton';
 import { useComputeDataFromEvent, useComputeHeaderColumn, formatRowForView } from './hooks/useEventList';
 import { DEFAULT_NUMBER_OF_ROW, SORT_DIRECTION } from './hooks/constants';
 import { getProgramAndStageForProgram } from '../../../../../metaData/helpers';
@@ -255,7 +256,7 @@ const StageDetailPlain = (props: Props & WithStyles<typeof styles>) => {
         >{i18n.t('Go to full {{ eventName }}', { eventName, interpolation: { escapeValue: false } })}</Button> : null);
 
         const renderCreateNewButton = () => (
-            <div className={classes.newButton}>
+            <div className={classes.newButton} style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
                 <StageCreateNewButton
                     eventCount={events.length}
                     onCreateNew={handleCreateNew}
@@ -263,6 +264,11 @@ const StageDetailPlain = (props: Props & WithStyles<typeof styles>) => {
                     repeatable={repeatable}
                     stageWriteAccess={stage?.access?.data?.write}
                     eventName={eventName}
+                />
+                <StageReplicateButton
+                    events={events}
+                    eventName={eventName}
+                    stageWriteAccess={stage?.access?.data?.write}
                 />
             </div>
         );
