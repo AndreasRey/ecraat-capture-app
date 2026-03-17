@@ -33,7 +33,7 @@ import {
     useEnrollmentPageLayout,
 } from '../../common/EnrollmentOverviewDomain/EnrollmentPageLayout/hooks/useEnrollmentPageLayout';
 import { DefaultPageLayout, WidgetsForEnrollmentPageDefault } from './DefaultPageLayout';
-import { ecraatConfig } from '../../../../../../ecraat';
+import { ecraatConfig, usePrefillOnEnrollmentPage } from '../../../../../../ecraat';
 import { LoadingMaskForPage } from '../../../LoadingMasks';
 import {
     EnrollmentPageKeys,
@@ -53,6 +53,7 @@ export const EnrollmentPageDefault = () => {
     const { status: widgetEnrollmentStatus } = useSelector(({ widgetEnrollment }: any) => widgetEnrollment);
     const { enrollmentId, programId, teiId, orgUnitId } = useLocationQuery();
     const { orgUnit, error } = useCoreOrgUnit(orgUnitId);
+    const { isPrefillLoading } = usePrefillOnEnrollmentPage(orgUnitId);
     const { onLinkedRecordClick } = useLinkedRecordClick();
     const {
         pageLayout,
@@ -209,7 +210,7 @@ export const EnrollmentPageDefault = () => {
             orgUnitId={orgUnitId}
             program={program}
             stages={stages}
-            events={enrollment?.events}
+            events={isPrefillLoading ? undefined : enrollment?.events}
             enrollmentId={enrollmentId}
             onAddNew={onAddNew}
             onDelete={onDelete}

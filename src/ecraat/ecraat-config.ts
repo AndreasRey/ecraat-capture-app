@@ -104,6 +104,24 @@ export const ecraatConfig = {
     },
 
     /**
+     * Prefill from Event Program
+     * When creating a new blank event for the target stage, automatically
+     * fetch data values from the most recent completed event in a separate
+     * event program (for the same organisation unit) and prefill matching
+     * data elements in the new event form.
+     */
+    prefillFromEventProgram: {
+        /** Stage ID that triggers prefill when creating a new blank event */
+        targetStageId: 'V8LAoeKM9LJ',
+
+        /** Event program ID to fetch the last completed event from */
+        sourceProgram: 'wr07HD8uWvu',
+
+        /** Program stage ID within the source event program */
+        sourceStage: 'OAuzv6FXg9h',
+    },
+
+    /**
      * Breadcrumb customizations
      */
     breadcrumb: {

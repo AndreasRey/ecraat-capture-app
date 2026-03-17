@@ -5,6 +5,9 @@ import { getNoteValidatorContainers } from '../fieldValidators/note.validatorCon
 import type { ProgramCategory } from '../../../WidgetEventSchedule/CategoryOptions/CategoryOptions.types';
 import { getCategoryOptionsValidatorContainers } from '../fieldValidators/categoryOptions.validatorContainersGetter';
 import type { DataEntryPropToInclude } from '../../../DataEntry/actions/dataEntryLoad.utils';
+import { getLocationQuery } from '../../../../utils/routing';
+import { ecraatConfig } from '../../../../../../ecraat/ecraat-config';
+import { getPrefillFormValues } from '../../../../../../ecraat/prefillStore';
 
 const dataEntryPropsToInclude: Array<DataEntryPropToInclude> = [
     {
@@ -56,5 +59,13 @@ export const getOpenDataEntryActions =
                 ),
             })));
         }
-        return loadNewDataEntry(dataEntryId, itemId, dataEntryPropsToInclude, defaultDataEntryValues);
+        return loadNewDataEntry(dataEntryId, itemId, dataEntryPropsToInclude, defaultDataEntryValues,
+            (() => {
+                const { stageId, orgUnitId } = getLocationQuery();
+                if (stageId === ecraatConfig.prefillFromEventProgram?.targetStageId && orgUnitId) {
+                    return getPrefillFormValues(orgUnitId);
+                }
+                return undefined;
+            })(),
+        );
     };
