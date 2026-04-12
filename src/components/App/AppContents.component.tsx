@@ -27,7 +27,7 @@ const Index = ({ classes }: Props) => {
     // ECRAAT: Block app navigation when profile security settings are missing
     const { showWarning, emailMissing, twoFAMissing } = useProfileCheck();
 
-    if (showWarning) {
+    if (showWarning && process.env.NODE_ENV === 'production') {
         return (
             <ProfileSetupWarning
                 emailMissing={emailMissing}
