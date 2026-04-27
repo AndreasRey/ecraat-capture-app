@@ -13,6 +13,8 @@ import {
     SingleLockedSelect,
 } from '../../ScopeSelector';
 import { TopBarActions } from '../../TopBarActions';
+// ECRAAT: Testing/training banner
+import TestingBanner from '../../../../../ecraat/TestingBanner';
 
 type TopBarProps = {
     programId: string,
@@ -42,6 +44,8 @@ export const TopBar = ({
     const { reset } = useReset();
 
     return (
+        <>
+        <TestingBanner />
         <ScopeSelector
             selectedProgramId={programId}
             selectedOrgUnitId={orgUnitId}
@@ -78,5 +82,6 @@ export const TopBar = ({
             ) : <></>}
             <TopBarActions selectedProgramId={programId} selectedOrgUnitId={orgUnitId} />
         </ScopeSelector>
+        </>
     );
 };

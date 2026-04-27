@@ -5,6 +5,9 @@
     "cacheVersion": "2",
     "license": "BSD-3-Clause",
     "private": true,
+    "workspaces": [
+        "packages/rules-engine"
+    ],
     "dependencies": {
         "@dhis2-ui/calendar": "^10.7.6",
         "@dhis2/rules-engine-javascript": "105.7.0",

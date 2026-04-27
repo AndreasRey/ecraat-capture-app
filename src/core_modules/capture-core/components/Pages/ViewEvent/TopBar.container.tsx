@@ -13,6 +13,8 @@ import {
     resetAllCategoryOptions,
 } from './ViewEventPage.actions';
 import { TopBarActions } from '../../TopBarActions';
+// ECRAAT: Testing/training banner
+import TestingBanner from '../../../../../ecraat/TestingBanner';
 
 type TopBarProps = {
     isUserInteractionInProgress: boolean,
@@ -55,6 +57,8 @@ export const TopBar = ({
     }, [dispatch]);
 
     return (
+        <>
+        <TestingBanner />
         <ScopeSelector
             selectedProgramId={programId}
             selectedOrgUnitId={orgUnitId}
@@ -77,5 +81,6 @@ export const TopBar = ({
                 isUserInteractionInProgress={isUserInteractionInProgress}
             />
         </ScopeSelector>
+        </>
     );
 };

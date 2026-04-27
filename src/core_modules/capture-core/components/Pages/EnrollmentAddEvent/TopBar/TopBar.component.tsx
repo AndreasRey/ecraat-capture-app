@@ -2,6 +2,8 @@ import React from 'react';
 import i18n from '@dhis2/d2-i18n';
 import { ScopeSelector, SingleLockedSelect, useReset } from '../../../ScopeSelector';
 import { TopBarActions } from '../../../TopBarActions';
+// ECRAAT: Testing/training banner
+import TestingBanner from '../../../../../../ecraat/TestingBanner';
 import type { Props } from './topBar.types';
 
 export const EnrollmentAddEventTopBar = ({
@@ -25,6 +27,8 @@ export const EnrollmentAddEventTopBar = ({
 }: Props) => {
     const { reset } = useReset();
     return (
+        <>
+        <TestingBanner />
         <ScopeSelector
             selectedProgramId={programId}
             selectedOrgUnitId={orgUnitId}
@@ -99,5 +103,6 @@ export const EnrollmentAddEventTopBar = ({
                 isUserInteractionInProgress={userInteractionInProgress}
             />
         </ScopeSelector>
+        </>
     );
 };
