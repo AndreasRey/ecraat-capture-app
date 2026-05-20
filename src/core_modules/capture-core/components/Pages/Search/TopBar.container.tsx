@@ -9,6 +9,8 @@ import {
     useReset,
 } from '../../ScopeSelector';
 import { TopBarActions } from '../../TopBarActions';
+// ECRAAT: Testing/training banner
+import TestingBanner from '../../../../../ecraat/TestingBanner';
 
 type TopBarProps = {
     programId?: string;
@@ -23,6 +25,8 @@ export const TopBar = ({ programId, orgUnitId }: TopBarProps) => {
     const { reset } = useReset();
 
     return (
+        <>
+        <TestingBanner />
         <ScopeSelector
             selectedProgramId={programId}
             selectedOrgUnitId={orgUnitId}
@@ -34,5 +38,6 @@ export const TopBar = ({ programId, orgUnitId }: TopBarProps) => {
         >
             <TopBarActions selectedProgramId={programId} selectedOrgUnitId={orgUnitId} />
         </ScopeSelector>
+        </>
     );
 };

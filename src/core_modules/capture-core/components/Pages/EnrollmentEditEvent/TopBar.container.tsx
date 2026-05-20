@@ -16,6 +16,8 @@ import {
     SingleLockedSelect,
 } from '../../ScopeSelector';
 import { TopBarActions } from '../../TopBarActions';
+// ECRAAT: Testing/training banner
+import TestingBanner from '../../../../../ecraat/TestingBanner';
 
 type Props = {
     programStage?: ProgramStage | null;
@@ -57,6 +59,8 @@ export const TopBar = ({
     const { reset } = useReset();
 
     return (
+        <>
+        <TestingBanner />
         <ScopeSelector
             selectedProgramId={programId}
             selectedOrgUnitId={orgUnitId}
@@ -127,5 +131,6 @@ export const TopBar = ({
                 isUserInteractionInProgress={isUserInteractionInProgress}
             />
         </ScopeSelector>
+        </>
     );
 };

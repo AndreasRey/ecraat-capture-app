@@ -17,6 +17,8 @@ import {
     resetAllCategoryOptions,
 } from './NewPage.actions';
 import { TopBarActions } from '../../TopBarActions';
+// ECRAAT: Testing/training banner
+import TestingBanner from '../../../../../ecraat/TestingBanner';
 
 type TopBarProps = {
     programId?: string;
@@ -71,6 +73,8 @@ export const TopBar = ({
     }, [dispatch]);
 
     return (
+        <>
+        <TestingBanner />
         <ScopeSelector
             selectedProgramId={programId}
             selectedOrgUnitId={orgUnitId}
@@ -111,5 +115,6 @@ export const TopBar = ({
                 onOpenNewRegistrationPage={onOpenNewRegistrationPage}
             />
         </ScopeSelector>
+        </>
     );
 };

@@ -16,6 +16,8 @@ import {
 } from '../shared/actions/mainPage.actions';
 import { TopBarActions } from '../../../TopBarActions';
 import type { TopBarProps } from './topBar.types';
+// ECRAAT: Testing/training banner
+import TestingBanner from '../../../../../../ecraat/TestingBanner';
 
 export const TopBar = ({ programId, orgUnitId, selectedCategories }: TopBarProps) => {
     const dispatch = useDispatch();
@@ -50,6 +52,8 @@ export const TopBar = ({ programId, orgUnitId, selectedCategories }: TopBarProps
     );
 
     return (
+        <>
+        <TestingBanner />
         <ScopeSelector
             selectedProgramId={programId}
             selectedOrgUnitId={orgUnitId}
@@ -65,5 +69,6 @@ export const TopBar = ({ programId, orgUnitId, selectedCategories }: TopBarProps
         >
             <TopBarActions selectedProgramId={programId} selectedOrgUnitId={orgUnitId} />
         </ScopeSelector>
+        </>
     );
 };
