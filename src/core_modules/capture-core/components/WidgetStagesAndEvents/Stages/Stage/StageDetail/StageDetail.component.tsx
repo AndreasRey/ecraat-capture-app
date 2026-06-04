@@ -81,6 +81,10 @@ const styles: Readonly<any> = {
     newButton: {
         margin: `${spacers.dp8} ${spacers.dp12}`,
     },
+    // ECRAAT: extra breathing room in the box right after the bottom buttons
+    footer: {
+        paddingBottom: '25px',
+    },
 };
 
 const StageDetailPlain = (props: Props & WithStyles<typeof styles>) => {
@@ -274,7 +278,7 @@ const StageDetailPlain = (props: Props & WithStyles<typeof styles>) => {
         );
 
         return (
-            <div>
+            <div className={classes.footer}>
                 {renderShowMoreButton()}
                 {renderViewAllButton()}
                 {renderCreateNewButton()}
