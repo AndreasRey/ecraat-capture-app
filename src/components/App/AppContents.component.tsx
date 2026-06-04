@@ -10,6 +10,10 @@ const getStyles = (theme: any) => ({
     app: {
         fontFamily: theme.typography.fontFamily,
         fontSize: theme.typography.pxToRem(16),
+        // ECRAAT: Ensure the very bottom of every page stays reachable on mobile.
+        // body/html use `overflow: hidden` (see app.css), so scrolling happens in an
+        // inner container; this spacer guarantees the last content can scroll into view.
+        paddingBottom: theme.typography.pxToRem(96),
     },
     // See https://dhis2.atlassian.net/browse/DHIS2-20078
     iOSWorkaround: {
