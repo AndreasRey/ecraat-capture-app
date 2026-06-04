@@ -31,6 +31,7 @@ const styles = {
         color: colors.grey800,
     },
     children: {
+        marginBottom: spacersNum.dp16,
         borderTopLeftRadius: 0,
         borderTopRightRadius: 0,
         borderBottomLeftRadius: 3,
@@ -98,6 +99,7 @@ const WidgetCollapsiblePlain = ({
     color = colors.white,
     borderless = false,
     children,
+    contentClassName,
     classes,
 }: Props) => {
     const [childrenVisible, setChildrenVisibility] = useState(open); // controls whether children are rendered to the DOM
@@ -154,7 +156,7 @@ const WidgetCollapsiblePlain = ({
                 childrenVisible ? (
                     <div
                         data-test="widget-contents"
-                        className={cx(classes.children, {
+                        className={cx(classes.children, contentClassName, {
                             open: animationsReady && open,
                             close: animationsReady && !open,
                             borderless,

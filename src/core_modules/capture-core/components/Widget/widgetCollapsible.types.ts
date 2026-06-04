@@ -8,4 +8,5 @@ export type WidgetCollapsiblePropsPlain = {
     onClose: () => void;
     color?: string;
     borderless?: boolean;
+    contentClassName?: string;
 };
