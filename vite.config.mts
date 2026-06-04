@@ -21,6 +21,51 @@ const viteConfig = defineConfig((configEnv) => {
         },
         build: {
             sourcemap: false,
+            chunkSizeWarningLimit: 1500,
+            rollupOptions: {
+                output: {
+                    // Split third-party code into several cacheable vendor chunks.
+                    //
+                    // The ONLY safe chunk boundary is one that no dependency cycle
+                    // crosses; otherwise the two chunks deadlock on init order at
+                    // runtime ("X is not a function"). So each group below is either
+                    // a SINK (depends on nothing in another split chunk) or a LEAF
+                    // CONSUMER (nothing in another split chunk depends on it):
+                    //   - vendor-react: react + EVERY package react itself pulls in.
+                    //     It must be the full closure, or a leftover leaf (e.g.
+                    //     object-assign) stays in `vendor` and re-creates the cycle.
+                    //     Nothing react needs lives elsewhere -> sink -> safe.
+                    //   - vendor-dhis2 / vendor-maps: leaf consumers (no other
+                    //     third-party package imports them) -> safe.
+                    //   - vendor: everything else, INCLUDING the redux+rxjs cluster
+                    //     kept together. Splitting redux from rxjs is what crashed
+                    //     before, so they deliberately stay in one chunk.
+                    // This grouping is verified acyclic by scripts/analyzeChunkCycles.mjs.
+                    manualChunks(id: string) {
+                        if (!id.includes('node_modules')) {
+                            return undefined;
+                        }
+                        // Leave moment alone so the platform's per-locale
+                        // dynamic-import chunk splitting keeps working.
+                        if (/[\\/]node_modules[\\/]moment[\\/]/.test(id)) {
+                            return undefined;
+                        }
+                        // Map libraries: a leaf consumer (nothing else in
+                        // node_modules imports them). Verified acyclic.
+                        if (/[\\/]node_modules[\\/](leaflet|leaflet-draw|react-leaflet|@react-leaflet|react-leaflet-draw|react-leaflet-search-unpolyfilled)/.test(id)) {
+                            return 'vendor-maps';
+                        }
+                        // Everything else (react, @dhis2, redux+rxjs, lodash,
+                        // emotion, ...) stays together. The cycle analyzer proved
+                        // that splitting any of these out (even dependency-free
+                        // libs like lodash, due to Rollup's shared-module chunk
+                        // assignment) re-introduces a cross-chunk cycle and the
+                        // runtime init-order crash. `vendor-maps` is the only
+                        // sub-split of node_modules that is verifiably acyclic here.
+                        return 'vendor';
+                    },
+                },
+            },
         },
         optimizeDeps: {
             include: [
