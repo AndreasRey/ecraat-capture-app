@@ -5,7 +5,6 @@ import type {
 import {
     DefaultWidgetsForEnrollmentOverview,
     EditEventWorkspace,
-    EventNote,
     AssigneeWidget,
     WidgetTypes,
     TwoEventWorkspace,
@@ -16,7 +15,6 @@ export const WidgetsForEnrollmentEventEdit: Readonly<{ [key: string]: WidgetConf
     EditEventWorkspace,
     TwoEventWorkspace,
     RelatedStagesWorkspace,
-    EventNote,
     AssigneeWidget,
     ...DefaultWidgetsForEnrollmentOverview,
 });
@@ -44,10 +42,6 @@ export const DefaultPageLayout: PageLayoutConfig = {
         {
             type: WidgetTypes.COMPONENT,
             name: 'WarningWidget',
-        },
-        {
-            type: WidgetTypes.COMPONENT,
-            name: 'EventNote',
         },
         {
             type: WidgetTypes.COMPONENT,

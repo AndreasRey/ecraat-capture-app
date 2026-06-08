@@ -101,6 +101,9 @@ export const ecraatConfig = {
 
         /** Hide the "Organisation unit" field (pre-filled, not editable) */
         hideOrgUnitField: true,
+
+        /** Hide the "Notes" section from the new-event and edit-event collection forms */
+        hideNotesSection: true,
     },
 
     /**

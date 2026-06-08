@@ -415,7 +415,10 @@ const WrappedDataEntry = compose(
         isApplicable: () => !ecraatConfig.eventForm.hideOrgUnitField,
     }),
     withDataEntryFieldIfApplicable(buildGeometrySettingsFn()),
-    withDataEntryField(buildNotesSettingsFn()),
+    withDataEntryFieldIfApplicable({
+        ...buildNotesSettingsFn(),
+        isApplicable: () => !ecraatConfig.eventForm.hideNotesSection,
+    }),
     withDataEntryFieldIfApplicable(buildAssigneeSettingsFn()),
     withCleanUp(),
     withFilterProps(dataEntryFilterProps),
