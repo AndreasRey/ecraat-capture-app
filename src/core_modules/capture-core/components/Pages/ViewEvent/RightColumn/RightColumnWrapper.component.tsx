@@ -6,7 +6,6 @@ import { WarningsSection } from './WarningsSection/WarningsSection.container';
 import { WidgetFeedback } from '../../../WidgetFeedback';
 import { WidgetIndicator } from '../../../WidgetIndicator';
 import { RelationshipsSection } from './RelationshipsSection/RelationshipsSection.container';
-import { NotesSection } from './NotesSection/NotesSection.container';
 import { AssigneeSection } from './AssigneeSection';
 
 const getStyles = (theme: any) => ({
@@ -48,7 +47,6 @@ const componentContainers: Array<ComponentContainer> = [
     },
     { id: 'AssigneeSection', Component: AssigneeSection },
     { id: 'RelationshipsSection', Component: RelationshipsSection },
-    { id: 'NotesSection', Component: NotesSection },
 ];
 
 class RightColumnWrapperPlain extends React.Component<Props> {

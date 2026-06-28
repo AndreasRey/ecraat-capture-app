@@ -12,7 +12,7 @@ import type { PlainProps } from './NotesSection.types';
 
 const LoadingNotes = withLoadingIndicator(null, props => ({ style: props.loadingIndicatorStyle }))(Notes);
 
-const headerText = i18n.t('Notes');
+const headerText = i18n.t('Notes about this event');
 
 const getStyles = (theme: any) => ({
     badge: {

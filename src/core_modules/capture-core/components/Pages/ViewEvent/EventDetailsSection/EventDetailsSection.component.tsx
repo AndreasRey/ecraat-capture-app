@@ -18,6 +18,7 @@ import { ViewEventSection } from '../Section/ViewEventSection.component';
 import { ViewEventSectionHeader } from '../Section/ViewEventSectionHeader.component';
 import { EditEventDataEntry } from '../../../WidgetEventEdit/EditEventDataEntry/EditEventDataEntry.container';
 import { ViewEventDataEntry } from '../../../WidgetEventEdit/ViewEventDataEntry/ViewEventDataEntry.container';
+import { NotesSection } from '../RightColumn/NotesSection/NotesSection.container';
 import { dataElementTypes } from '../../../../metaData';
 import { useCoreOrgUnit } from '../../../../metadataRetrieval/coreOrgUnit';
 import { NoticeBox } from '../../../NoticeBox';
@@ -37,6 +38,9 @@ const getStyles: any = () => ({
     container: {
         flexGrow: 2,
         flexBasis: 0,
+        display: 'flex',
+        flexDirection: 'column',
+        gap: spacers.dp16,
     },
     dataEntryContent: {
         display: 'flex',
@@ -200,6 +204,10 @@ const EventDetailsSectionPlain = (props: PlainProps & { classes: any }) => {
 
     return (
         <div className={classes.container}>
+            <NotesSection
+                programStage={programStage}
+                eventAccess={eventAccess}
+            />
             <ViewEventSection
                 header={(
                     <div className={classes.headerContainer}>

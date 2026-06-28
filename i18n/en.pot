@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2026-06-04T09:22:13.848Z\n"
-"PO-Revision-Date: 2026-06-04T09:22:13.849Z\n"
+"POT-Creation-Date: 2026-06-28T22:42:34.800Z\n"
+"PO-Revision-Date: 2026-06-28T22:42:34.801Z\n"
 
 msgid "The application could not be loaded."
 msgstr "The application could not be loaded."
@@ -233,6 +233,9 @@ msgstr "Basic info"
 
 msgid "Status"
 msgstr "Status"
+
+msgid "Notes about this event"
+msgstr "Notes about this event"
 
 msgid "Relationships"
 msgstr "Relationships"
@@ -1482,9 +1485,6 @@ msgstr "Event completed"
 
 msgid "The event cannot be edited after it has been completed"
 msgstr "The event cannot be edited after it has been completed"
-
-msgid "Notes about this event"
-msgstr "Notes about this event"
 
 msgid "Write a note about this event"
 msgstr "Write a note about this event"
