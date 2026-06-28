@@ -317,7 +317,7 @@ const buildNotesSettingsFn = () => {
         getPropName: () => 'note',
         getValidatorContainers: () => getNoteValidatorContainers(),
         getMeta: () => ({
-            placement: placements.BOTTOM,
+            placement: placements.TOP,
             section: dataEntrySectionNames.NOTES,
         }),
     };
@@ -456,6 +456,10 @@ type DataEntrySection = {
 };
 
 const dataEntrySectionDefinitions = {
+    [dataEntrySectionNames.NOTES]: {
+        placement: placements.TOP,
+        name: i18n.t('Notes about this event'),
+    },
     [dataEntrySectionNames.BASICINFO]: {
         placement: placements.TOP,
         name: i18n.t('Basic info'),
@@ -463,10 +467,6 @@ const dataEntrySectionDefinitions = {
     [dataEntrySectionNames.STATUS]: {
         placement: placements.BOTTOM,
         name: i18n.t('Status'),
-    },
-    [dataEntrySectionNames.NOTES]: {
-        placement: placements.BOTTOM,
-        name: i18n.t('Notes'),
     },
     [dataEntrySectionNames.RELATIONSHIPS]: {
         placement: placements.BOTTOM,

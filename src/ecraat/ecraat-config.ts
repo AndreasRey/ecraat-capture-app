@@ -103,7 +103,7 @@ export const ecraatConfig = {
         hideOrgUnitField: true,
 
         /** Hide the "Notes" section from the new-event and edit-event collection forms */
-        hideNotesSection: true,
+        hideNotesSection: false,
     },
 
     /**
