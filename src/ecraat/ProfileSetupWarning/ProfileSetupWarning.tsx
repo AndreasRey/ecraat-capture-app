@@ -36,7 +36,7 @@ export const ProfileSetupWarning = ({ emailMissing, twoFAMissing }: Props) => {
             <ModalTitle>Account Security Setup</ModalTitle>
             <ModalContent>
                 <div className={classes.appTitle}>
-                    ECRAAT Detention Facility Risk Assessment
+                    ECRAAT Data Capture
                 </div>
                 <p className={classes.intro}>
                     Your account is missing one or more important security settings.

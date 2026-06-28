@@ -31,7 +31,10 @@ const Index = ({ classes }: Props) => {
     // ECRAAT: Block app navigation when profile security settings are missing
     const { showWarning, emailMissing, twoFAMissing } = useProfileCheck();
 
-    if (showWarning && process.env.NODE_ENV === 'production') {
+    // Skip the blocking 2FA/email setup screen when running on localhost
+    const isLocalhost = window.location.hostname.startsWith('localhost');
+
+    if (showWarning && process.env.NODE_ENV === 'production' && !isLocalhost) {
         return (
             <ProfileSetupWarning
                 emailMissing={emailMissing}
