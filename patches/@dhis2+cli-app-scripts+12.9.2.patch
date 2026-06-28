@@ -1,0 +1,47 @@
+diff --git a/node_modules/@dhis2/cli-app-scripts/src/lib/compiler/compile.js b/node_modules/@dhis2/cli-app-scripts/src/lib/compiler/compile.js
+index e68744b..bd68960 100644
+--- a/node_modules/@dhis2/cli-app-scripts/src/lib/compiler/compile.js
++++ b/node_modules/@dhis2/cli-app-scripts/src/lib/compiler/compile.js
+@@ -20,8 +20,21 @@ const watchFiles = ({ inputDir, outputDir, processFileCallback, watch }) => {
+         const relative = path.relative(inputDir, source)
+         const destination = path.join(outputDir, relative)
+         reporter.debug(`File ${relative} changed or added...`)
+-        await fs.ensureDir(path.dirname(destination))
+-        await processFileCallback(source, destination)
++        try {
++            await fs.ensureDir(path.dirname(destination))
++            await processFileCallback(source, destination)
++        } catch (err) {
++            // A safe-write editor/tool creates `<file>.tmp.<pid>.<hash>` and
++            // renames it over the target. The watcher can fire `add` for the
++            // source and then the file is gone before we copy it, so `fs.copy`
++            // throws ENOENT. Swallow that transient race instead of letting it
++            // bubble up as an uncaught exception that kills the dev server.
++            if (err && err.code === 'ENOENT') {
++                reporter.debug(`Skipped vanished file ${relative}`)
++                return
++            }
++            throw err
++        }
+     }
+ 
+     const removeFile = async (file) => {
+@@ -32,7 +45,17 @@ const watchFiles = ({ inputDir, outputDir, processFileCallback, watch }) => {
+     }
+ 
+     return new Promise((resolve, reject) => {
+-        const watcher = chokidar.watch(inputDir, { persistent: true })
++        const watcher = chokidar.watch(inputDir, {
++            persistent: true,
++            // Don't watch safe-write temp files (`<file>.tmp.<pid>.<hash>`),
++            // which appear and are renamed away in microseconds. The regex
++            // matches absolute paths regardless of separator (a forward-slash
++            // glob can miss Windows backslash paths).
++            ignored: /\.tmp\.\d+\./,
++            // Wait for files to stop changing before emitting; the documented
++            // chokidar option for editors/tools that write atomically.
++            awaitWriteFinish: { stabilityThreshold: 200, pollInterval: 50 },
++        })
+ 
+         watcher
+             .on('ready', async () => {
