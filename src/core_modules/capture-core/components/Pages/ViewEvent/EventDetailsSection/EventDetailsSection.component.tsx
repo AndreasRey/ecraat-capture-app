@@ -32,6 +32,8 @@ import { isValidPeriod } from '../../../../utils/validation/validators/form/expi
 import { useProgramExpiryForUser } from '../../../../hooks';
 import { convertFormToClient } from '../../../../converters';
 import { useAuthorities } from '../../../../utils/authority/useAuthorities';
+// ECRAAT: read-only "related" event programs hide the edit button and notes
+import { isRelatedEventProgram } from '../../../../../../ecraat';
 import type { PlainProps } from './EventDetailsSection.types';
 
 const getStyles: any = () => ({
@@ -91,6 +93,8 @@ const EventDetailsSectionPlain = (props: PlainProps & { classes: any }) => {
     const [actionsIsOpen, setActionsIsOpen] = useState(false);
     const expiryPeriod = useProgramExpiryForUser(programId);
     const { hasAuthority: canUncompleteEvent } = useAuthorities({ authorities: ['F_UNCOMPLETE_EVENT'] });
+    // ECRAAT: events from the read-only "related" event programs are view-only (no edit, no notes)
+    const isReadOnlyRelated = isRelatedEventProgram(programId);
 
     const onSaveExternal = useCallback(() => {
         const queryKey = [ReactQueryAppNamespace, 'changelog', CHANGELOG_ENTITY_TYPES.EVENT, eventId];
@@ -152,7 +156,7 @@ const EventDetailsSectionPlain = (props: PlainProps & { classes: any }) => {
 
     const renderActionsContainer = () => (
         <div className={classes.actionsContainer}>
-            {!showEditEvent && !isLoading &&
+            {!showEditEvent && !isLoading && !isReadOnlyRelated &&
                 <div className={classes.editButtonContainer}>
                     <ConditionalTooltip
                         content={tooltipContent}
@@ -204,10 +208,12 @@ const EventDetailsSectionPlain = (props: PlainProps & { classes: any }) => {
 
     return (
         <div className={classes.container}>
-            <NotesSection
-                programStage={programStage}
-                eventAccess={eventAccess}
-            />
+            {!isReadOnlyRelated && (
+                <NotesSection
+                    programStage={programStage}
+                    eventAccess={eventAccess}
+                />
+            )}
             <ViewEventSection
                 header={(
                     <div className={classes.headerContainer}>

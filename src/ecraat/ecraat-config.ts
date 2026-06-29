@@ -125,6 +125,42 @@ export const ecraatConfig = {
     },
 
     /**
+     * Related read-only events from separate event programs.
+     * On each enrollment dashboard, also display (read-only) events collected in
+     * other event programs so users can see related data captured elsewhere.
+     * Each entry renders its own card listing the program's events with the event
+     * date plus the stage's "display in reports" data elements. Clicking a row
+     * opens that event in the read-only event viewer.
+     */
+    relatedEventPrograms: {
+        /** Master toggle for the read-only related-events cards */
+        enabled: true,
+
+        /** One card per entry, rendered in order below "Stages and Events" */
+        programs: [
+            {
+                /** Event program whose events are shown for the enrollment's org unit */
+                programId: 'wr07HD8uWvu',
+                /**
+                 * Which org unit to query:
+                 * 'enrollment' → the org unit being collected to (the enrollment org unit)
+                 */
+                orgUnitSource: 'enrollment',
+                /** Only used when orgUnitSource is 'fixed' */
+                orgUnitId: null,
+            },
+            {
+                /** Country-level event program */
+                programId: 'NvYWk2CbgrJ',
+                /** 'fixed' → always query the org unit specified in `orgUnitId` */
+                orgUnitSource: 'fixed',
+                /** Country-level org unit the events are collected to */
+                orgUnitId: 'JN2W3Y3t5b1',
+            },
+        ],
+    },
+
+    /**
      * Breadcrumb customizations
      */
     breadcrumb: {

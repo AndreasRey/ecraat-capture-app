@@ -55,8 +55,8 @@ export const addEventNote = (eventId: string, note: any) =>
 export const removeEventNote = (eventId: string, noteClientId: string) =>
     actionCreator(actionTypes.REMOVE_EVENT_NOTE)({ eventId, noteClientId });
 
-export const startGoBackToMainPage = (orgUnitId: string | null) =>
-    actionCreator(actionTypes.START_GO_BACK_TO_MAIN_PAGE)({ orgUnitId });
+export const startGoBackToMainPage = (orgUnitId: string | null, programIdFromUrl?: string | null) =>
+    actionCreator(actionTypes.START_GO_BACK_TO_MAIN_PAGE)({ orgUnitId, programIdFromUrl });
 
 export const noWorkingListUpdateNeededOnBackToMainPage = () =>
     actionCreator(actionTypes.NO_WORKING_LIST_UPDATE_NEEDED_ON_BACK_TO_MAIN_PAGE)();

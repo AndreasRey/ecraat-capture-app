@@ -2,6 +2,7 @@ import { WidgetTypes } from './DefaultEnrollmentLayout.constants';
 
 type DefaultComponents = 'QuickActions'
     | 'StagesAndEvents'
+    | 'RelatedProgramEvents'
     | 'AssigneeWidget'
     | 'NewEventWorkspace'
     | 'EditEventWorkspace'

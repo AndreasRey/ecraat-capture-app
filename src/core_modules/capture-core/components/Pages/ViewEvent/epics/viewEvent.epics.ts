@@ -160,7 +160,8 @@ export const backToMainPageLocationChangeEpic = (action$: any, store: any, { nav
         switchMap((action: any) => {
             const orgUnitId = action.payload.orgUnitId;
             const state = store.value;
-            const programId = state.currentSelections.programId;
+            // ECRAAT: prefer a programId carried in the URL (read-only related events) over the viewed event's program
+            const programId = action.payload.programIdFromUrl || state.currentSelections.programId;
             const showaccessible = state.currentSelections.showaccessible;
 
             if (showaccessible && !orgUnitId) {

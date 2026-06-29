@@ -9,10 +9,23 @@ import type {
     PageLayoutConfig,
     WidgetConfig,
 } from '../../../common/EnrollmentOverviewDomain/EnrollmentPageLayout/DefaultEnrollmentLayout.types';
+// ECRAAT: read-only cards listing events from separate event programs
+import { ecraatConfig } from '../../../../../../../ecraat';
+import { RelatedProgramEvents as RelatedProgramEventsComponent } from '../../../../../../../ecraat/RelatedProgramEvents';
+
+const RelatedProgramEvents: WidgetConfig = {
+    Component: RelatedProgramEventsComponent,
+    shouldHideWidget: () => !ecraatConfig.relatedEventPrograms.enabled,
+    getProps: ({ orgUnitId, program }: any) => ({
+        enrollmentOrgUnitId: orgUnitId,
+        enrollmentProgramId: program?.id,
+    }),
+};
 
 export const WidgetsForEnrollmentPageDefault: Readonly<Record<string, WidgetConfig>> = Object.freeze({
     QuickActions,
     StagesAndEvents,
+    RelatedProgramEvents,
     EnrollmentNote,
     ...DefaultWidgetsForEnrollmentOverview,
 });
@@ -26,6 +39,10 @@ export const DefaultPageLayout: PageLayoutConfig = {
         {
             type: WidgetTypes.COMPONENT,
             name: 'StagesAndEvents',
+        },
+        {
+            type: WidgetTypes.COMPONENT,
+            name: 'RelatedProgramEvents',
         },
     ],
     rightColumn: [

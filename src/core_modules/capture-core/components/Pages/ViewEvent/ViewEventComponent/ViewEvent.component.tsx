@@ -75,10 +75,12 @@ export const ViewEventPlain = (props: Props & WithStyles<typeof getStyles>) => {
     } = props;
 
     const dispatch = useDispatch();
-    const { orgUnitId } = useLocationQuery();
+    const { orgUnitId, programId: programIdFromUrl } = useLocationQuery();
     const onBackToAllEvents = useCallback(() => {
-        dispatch(startGoBackToMainPage(orgUnitId));
-    }, [dispatch, orgUnitId]);
+        // ECRAAT: when present (e.g. read-only related events), use the URL's programId for back-navigation
+        // so the user returns to the program/org unit they came from rather than the viewed event's program.
+        dispatch(startGoBackToMainPage(orgUnitId, programIdFromUrl));
+    }, [dispatch, orgUnitId, programIdFromUrl]);
 
     const hideWidgets = useHideWidgetByRuleLocations(programRules);
 

@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2026-06-28T22:42:34.800Z\n"
-"PO-Revision-Date: 2026-06-28T22:42:34.801Z\n"
+"POT-Creation-Date: 2026-06-29T11:17:50.747Z\n"
+"PO-Revision-Date: 2026-06-29T11:17:50.749Z\n"
 
 msgid "The application could not be loaded."
 msgstr "The application could not be loaded."
@@ -2296,6 +2296,18 @@ msgstr "Page {{currentPage}}"
 
 msgid "Area on map saved"
 msgstr "Area on map saved"
+
+msgid "Related events"
+msgstr "Related events"
+
+msgid "Loading events…"
+msgstr "Loading events…"
+
+msgid "No organisation unit selected."
+msgstr "No organisation unit selected."
+
+msgid "No events recorded for this organisation unit."
+msgstr "No events recorded for this organisation unit."
 
 msgid "Compatibility mode"
 msgstr "Compatibility mode"
