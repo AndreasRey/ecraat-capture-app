@@ -20,9 +20,12 @@ Compared to stock Capture, it:
 - **Removes almost all selector/filter/navigation chrome** (scope selector, working-list tabs,
   filters, column controls) so users follow one linear workflow:
   *pick a place → see its sectors/buildings → open one → fill assessment forms*.
-- Strips the enrollment dashboard down to the **Stages & Events widget only**, centered on the page.
+- Strips the enrollment dashboard down to the **Stages & Events widget**, centered on the page,
+  followed by **read-only cards listing events from related event programs**.
 - Adds two productivity features for assessments: **"Replicate last event"** (copy the previous
   completed form) and **prefill from a companion event program**.
+- Makes event **notes prominent**: the Notes section is renamed "Notes about this event" and moved
+  to the top of the new/edit/view event pages.
 - Adds operational guardrails: an account-security gate (email + 2FA), an environment banner,
   and mobile-friendly spacing fixes.
 
@@ -103,6 +106,16 @@ inventory below, verified against the smoke-test checklist in Phase 6.
       `.eslintrc` → add `"linebreak-style": "off"`; `.husky/pre-push` → comment out
       `yarn linter:check && yarn tsc:check` (CRLF causes false positives). Leave these upstream
       if the team develops on Linux/macOS/CI.
+- [ ] **patch-package dev-server fix** — add `patch-package` as a devDependency, prepend it to
+      the postinstall script (`"postinstall": "patch-package && husky install && …"`), and copy
+      `legacy/patches/@dhis2+cli-app-scripts+12.9.2.patch`. The patch stops `yarn start` from
+      crashing when editors write files atomically (safe-write `*.tmp.<pid>.*` files): it makes
+      the compiler's chokidar watcher ignore temp files, wait for writes to finish, and swallow
+      transient ENOENT during copy. ⚠️ The patch is pinned to `@dhis2/cli-app-scripts` **12.9.2**;
+      the fresh upstream will likely use a newer version. First test whether the problem still
+      exists (run the dev server and save source files repeatedly); if yes, re-create the patch
+      against the installed version (`npx patch-package @dhis2/cli-app-scripts` after editing
+      `node_modules`); if upstream fixed the watcher, drop the patch entirely.
 - [ ] **`scripts/analyzeChunkCycles.mjs`** — copy verbatim from `legacy/scripts/`. It statically
       proves the production bundle's eager chunk graph is acyclic (exit 1 if not).
 - [ ] **`vite.config.mts`** — add `build.chunkSizeWarningLimit: 1500` and a
@@ -137,6 +150,12 @@ against current upstream APIs:
       | `prefillFromEventProgram.targetStageId` | `V8LAoeKM9LJ` | Stage whose new-event form gets prefilled |
       | `prefillFromEventProgram.sourceProgram` | `wr07HD8uWvu` | Event program supplying prefill values |
       | `prefillFromEventProgram.sourceStage` | `OAuzv6FXg9h` | Stage inside the source program |
+      | `relatedEventPrograms.programs[0].programId` | `wr07HD8uWvu` | Read-only related-events card, queried at the enrollment's org unit (`orgUnitSource: 'enrollment'`) |
+      | `relatedEventPrograms.programs[1].programId` | `NvYWk2CbgrJ` | Read-only related-events card, country-level program (`orgUnitSource: 'fixed'`) |
+      | `relatedEventPrograms.programs[1].orgUnitId` | `JN2W3Y3t5b1` | Fixed country-level org unit for that card |
+
+      Flag values worth knowing: `eventForm.hideNotesSection` is currently **`false`** (notes are
+      shown — see 4.10; the flag exists so they can be hidden again later).
 
 - [ ] **`ecraat-overrides.css`** — CSS safety net that hides elements by stable `data-test`/`id`
       selectors (scope-selector quick selector, template chips, filter bar, quick-actions /
@@ -144,7 +163,27 @@ against current upstream APIs:
       Verify the selectors still exist in the current upstream (they are used by upstream Cypress
       tests, so they are usually stable).
 - [ ] **`index.ts`** — barrel re-exporting `ecraatConfig`, `usePrefillOnEnrollmentPage`,
-      `getPrefillFormValues`.
+      `getPrefillFormValues`, `isRelatedEventProgram`.
+- [ ] **`isRelatedEventProgram.ts`** — helper returning `true` when a programId is one of the
+      configured `relatedEventPrograms` (used to keep their events read-only in the viewer, 4.15).
+- [ ] **`RelatedProgramEvents/`** (`RelatedProgramEvents.tsx`, `RelatedProgramEventCard.tsx`,
+      `useRelatedProgramEventData.ts`, `index.ts`) — the read-only related-events cards.
+      Behavior contract (wiring into the dashboard is 4.15):
+      - One collapsible card (upstream `Widget`) per configured program, titled with the
+        program's display name.
+      - Org unit per card: the enrollment's org unit (`orgUnitSource: 'enrollment'`) or a fixed
+        one (`orgUnitSource: 'fixed'` + `orgUnitId`).
+      - Data: program metadata (`/api/programs/{id}` — first stage's `displayInReports` data
+        elements incl. option sets) + up to 50 events (`tracker/events`, `order=occurredAt:desc`,
+        handling both `instances`/`events` response shapes).
+      - Table columns: Date, Status, then one column per `displayInReports` data element
+        (header = formName || displayName); values formatted with upstream's
+        `convertServerToClient`/`convertClientToList` converters, option-set codes resolved to
+        display names (incl. comma-separated multi-text), raw value as fallback.
+      - Clicking a row opens `/viewEvent?viewEventId=…&orgUnitId=<enrollment org unit>&programId=<enrollment program>`
+        — deliberately the *enrollment's* context, so back-navigation returns to where the user
+        came from (see 4.15).
+      - Loading / no-org-unit / empty states rendered inside the card.
 - [ ] **`prefillStore.ts`** — tiny module-level store `{ set/getPrefillFormValues(orgUnitId) }`,
       keyed by orgUnitId so values stay correct across org-unit navigation.
 - [ ] **`usePrefillOnEnrollmentPage.ts`** — hook that fetches the most recent COMPLETED event of
@@ -162,10 +201,10 @@ against current upstream APIs:
       and adapt the field + truthiness check. The *contract* to preserve: `twoFAMissing === true`
       iff the user has no active 2FA method; `emailMissing === true` iff `email` is absent/blank.
 - [ ] **`ProfileSetupWarning/`** — blocking `@dhis2/ui` modal (title "Account Security Setup",
-      app label "ECRAAT Detention Facility Risk Assessment") shown instead of the app when email
-      and/or 2FA are missing. Contains deep links to `dhis-web-user-profile/#/profile` and
-      `#/twoFactor` (verify these user-profile-app routes still exist on 2.43) and a
-      "Refresh Page" button. **Deployment toggle:** it is only enforced in production builds
+      app label "ECRAAT Data Capture") shown instead of the app when email and/or 2FA are
+      missing. Contains deep links to `dhis-web-user-profile/#/profile` and `#/twoFactor`
+      (verify these user-profile-app routes still exist on 2.43) and a "Refresh Page" button.
+      **Deployment toggle:** only enforced in production builds and never on localhost
       (see Phase 4.13).
 - [ ] **`TestingBanner/`** — red full-width banner: "FOR TESTING PURPOSE ONLY", or "FOR TRAINING
       PURPOSE ONLY" when the hostname matches `/training/i`. **Deployment toggle:** the constant
@@ -272,8 +311,8 @@ same path under `legacy/`. Add `// ECRAAT:` markers on all of them.
   down: each key = `ecraatConfig.enrollmentDashboard.hideX || ruleHideWidgets?.x`.
 - EnrollmentQuickActions: wrap its JSX in `<div data-test="widget-quick-actions">` so the CSS
   backup can target it.
-- ✔ Dashboard shows ONLY the Stages & Events widget — no Quick Actions, no enrollment notes,
-  no Enrollment status widget, no Profile card.
+- ✔ Dashboard shows only the Stages & Events widget and the related-events cards (4.15) —
+  no Quick Actions, no enrollment notes, no Enrollment status widget, no Profile card.
 
 ### 4.7 Profile actions in the breadcrumb header
 - **Files:** `…/WidgetProfile/WidgetProfile.component.tsx` + `widgetProfile.types.ts`;
@@ -313,23 +352,40 @@ same path under `legacy/`. Add `// ECRAAT:` markers on all of them.
 - ✔ A user without write access to a stage doesn't see it at all; stages show both "New blank …"
   and "Replicate last …" buttons whether or not events exist.
 
-### 4.10 Event forms — hide Schedule tab, OrgUnit field, Notes
+### 4.10 Event forms — hide Schedule tab & OrgUnit field; make Notes prominent
 - **Files:** `…/Pages/EnrollmentAddEvent/NewEventWorkspace/NewEventWorkspace.component.tsx`,
   `…/WidgetEventEdit/EditEventDataEntry/EditEventDataEntry.component.tsx`,
   `…/WidgetEnrollmentEventNew/DataEntry/DataEntry.component.tsx`,
-  `…/Pages/EnrollmentEditEvent/PageLayout/DefaultPageLayout.constants.ts`
+  `…/DataEntries/SingleEventRegistrationEntry/DataEntryWrapper/DataEntry/DataEntry.component.tsx`,
+  `…/Pages/EnrollmentEditEvent/PageLayout/DefaultPageLayout.constants.ts`,
+  `…/Pages/ViewEvent/EventDetailsSection/EventDetailsSection.component.tsx`,
+  `…/Pages/ViewEvent/RightColumn/RightColumnWrapper.component.tsx`,
+  `…/Pages/ViewEvent/RightColumn/NotesSection/NotesSection.component.tsx`
 - Schedule tab (`eventForm.hideScheduleTab`): wrap the Schedule `<Tab>` in both the new-event
   workspace and the edit-event data entry.
 - Org unit field (`eventForm.hideOrgUnitField`): in both new-event and edit-event compose chains,
   replace `withDataEntryField(buildOrgUnitSettingsFn())` with `withDataEntryFieldIfApplicable({
   ...buildOrgUnitSettingsFn(), isApplicable: () => !ecraatConfig.eventForm.hideOrgUnitField })`
   (the `IfApplicable` HOC is upstream, already used for geometry/assignee).
-- Notes section (`eventForm.hideNotesSection`): same `IfApplicable` treatment for
-  `buildNotesSettingsFn()` in the new-event DataEntry compose chain. Additionally, on the
-  edit-event page layout constants, remove the `EventNote` widget from the widget map and the
-  page-layout column list (this one is a deliberate exception to rule 2 — mark it clearly).
-- ✔ New/edit event forms show no Schedule tab, no Organisation unit field, no Notes section
-  (neither in the form nor as a widget on the edit-event page).
+- Notes toggle (`eventForm.hideNotesSection`, currently **`false`** = notes shown): same
+  `IfApplicable` treatment for `buildNotesSettingsFn()` in the new-event DataEntry compose chain.
+  *History:* an earlier iteration hid notes entirely; June 2026 reversed that — notes are wanted,
+  and prominent. Keep the flag wired but leave it `false`.
+- Notes made prominent — **"Notes about this event", at the TOP of every event page**:
+  - New-event form (`WidgetEnrollmentEventNew/DataEntry`) and single-event form
+    (`SingleEventRegistrationEntry/…/DataEntry`): change the notes section placement from
+    `placements.BOTTOM` to `placements.TOP` (both in `buildNotesSettingsFn().getMeta` and in
+    `dataEntrySectionDefinitions`, listing NOTES first) and rename the section from "Notes" to
+    **"Notes about this event"**.
+  - Edit-event page layout constants (`EnrollmentEditEvent/PageLayout`): make sure the `EventNote`
+    widget is registered and placed at the **top of the left column, before `EditEventWorkspace`**
+    (upstream places it lower).
+  - View-event page: remove `NotesSection` from the right column (`RightColumnWrapper`) and render
+    it instead at the top of `EventDetailsSection`'s main column (give the container a vertical
+    flex layout with a 16px gap); rename its header to **"Notes about this event"**. Notes are
+    suppressed there for read-only related-program events — see 4.15.
+- ✔ New/edit/view event pages show no Schedule tab and no Organisation unit field; a
+  "Notes about this event" section appears at the top of each of these pages.
 
 ### 4.11 Prefill from the companion event program
 - **Files:** `EnrollmentPageDefault.container.tsx` (again),
@@ -358,11 +414,12 @@ same path under `legacy/`. Add `// ECRAAT:` markers on all of them.
 
 ### 4.13 Account-security gate (deployment toggle)
 - **File:** `src/components/App/AppContents.component.tsx`
-- Call `useProfileCheck()`; when `showWarning && process.env.NODE_ENV === 'production'`, render
-  `<ProfileSetupWarning emailMissing twoFAMissing />` INSTEAD of the app content (blocking).
-  Dev builds never block.
-- ✔ In a production build, a user without email or 2FA sees only the security-setup modal;
-  compliant users see the app. (Remember the 2.43 API adaptation in Phase 2 / `useProfileCheck`.)
+- Call `useProfileCheck()`; when `showWarning && process.env.NODE_ENV === 'production'` **and the
+  hostname does not start with `localhost`**, render `<ProfileSetupWarning emailMissing
+  twoFAMissing />` INSTEAD of the app content (blocking). Dev builds and localhost never block.
+- ✔ In a deployed production build, a user without email or 2FA sees only the security-setup
+  modal; compliant users see the app; a production build served on localhost is never blocked.
+  (Remember the 2.43 API adaptation in Phase 2 / `useProfileCheck`.)
 
 ### 4.14 Mobile & spacing fixes
 - **Files:** `AppContents.component.tsx` (again), `…/Widget/WidgetCollapsible.component.tsx` +
@@ -376,6 +433,31 @@ same path under `legacy/`. Add `// ECRAAT:` markers on all of them.
 - StageDetail: add `paddingBottom: 25px` to the footer that holds the bottom buttons.
 - ✔ On a mobile browser, the bottom buttons of the last widget are fully reachable; collapsible
   widgets have breathing room below their content.
+
+### 4.15 Related event programs — read-only cards on the enrollment dashboard
+- **Files:** `…/Pages/Enrollment/EnrollmentPageDefault/DefaultPageLayout/DefaultPageLayout.constants.ts`,
+  `…/EnrollmentPageLayout/DefaultEnrollmentLayout.types.ts`,
+  `…/Pages/ViewEvent/EventDetailsSection/EventDetailsSection.component.tsx`,
+  `…/Pages/ViewEvent/ViewEventComponent/ViewEvent.component.tsx` + `viewEvent.actions.ts`,
+  `…/Pages/ViewEvent/epics/viewEvent.epics.ts`
+- **Dashboard wiring:** in the enrollment-dashboard page-layout constants, register a
+  `RelatedProgramEvents` widget config — `Component` from `src/ecraat/RelatedProgramEvents`,
+  `shouldHideWidget: () => !ecraatConfig.relatedEventPrograms.enabled`, `getProps` mapping the
+  page's `orgUnitId`/`program.id` to `enrollmentOrgUnitId`/`enrollmentProgramId` — and add it to
+  the left column **right after `StagesAndEvents`**. Add `'RelatedProgramEvents'` to the
+  `DefaultComponents` type union.
+- **Read-only viewer:** in `EventDetailsSection`, compute `isRelatedEventProgram(programId)`;
+  when true, hide the Edit button and do not render the notes section (these events belong to
+  other programs and must stay view-only here).
+- **Back navigation:** the card rows open `/viewEvent` with the *enrollment's* `orgUnitId` and
+  `programId` in the URL. Extend `startGoBackToMainPage` to accept and carry a `programIdFromUrl`
+  payload, and make the back-to-main-page epic prefer it over the store's current program, so
+  "Back to all events" returns the user to the sector/building working list they came from —
+  not to the related event program's own context.
+- ✔ Below Stages & Events, one card per configured program shows a table of that program's events
+  (Date, Status, report columns with human-readable values); rows open the event read-only
+  (no Edit button, no notes); "back" from the viewer returns to the original working list;
+  setting `relatedEventPrograms.enabled = false` removes the cards entirely.
 
 ---
 
@@ -412,11 +494,18 @@ Smoke tests against the 2.43 instance (run the app with `yarn start`, connect to
       creates a copy dated strictly after the source, dashboard updates without reload.
 - [ ] **Prefill:** "New blank event" on the target stage opens pre-filled from the source program's
       latest completed event for that org unit.
-- [ ] **Event forms:** no Schedule tab, no Organisation unit field, no Notes section (new + edit).
+- [ ] **Event forms:** no Schedule tab, no Organisation unit field; "Notes about this event"
+      section at the TOP of the new-event, edit-event and view-event pages.
+- [ ] **Related events cards:** below Stages & Events, one card per configured program with
+      Date/Status/report columns and readable values (option-set names, formatted dates);
+      the fixed-org-unit card shows country-level events regardless of the current place;
+      clicking a row opens the event read-only (no Edit button, no notes) and "back" returns
+      to the original sector/building list.
 - [ ] **Banner:** shows on every page; "TRAINING" variant on a hostname containing "training".
-- [ ] **Security gate (production build only):** test with a user lacking email/2FA → blocking
-      modal with working profile/2FA links; compliant user passes through. Confirm the 2FA
-      detection works against **2.43's** `/api/me` shape.
+- [ ] **Security gate (production build, non-localhost only):** test with a user lacking
+      email/2FA → blocking modal with working profile/2FA links; compliant user passes through;
+      localhost is never blocked. Confirm the 2FA detection works against **2.43's** `/api/me`
+      shape.
 - [ ] **Mobile:** on a phone-sized viewport, bottom-most buttons are reachable.
 
 ---
@@ -440,9 +529,10 @@ Smoke tests against the 2.43 instance (run the app with `yarn start`, connect to
 
 **New files (never conflict with upstream — copy from `legacy/`):**
 `src/ecraat/**` (config, CSS overrides, barrel, prefill store + hook, profile-check hook,
-ProfileSetupWarning, TestingBanner), `…/components/EcraatHomePage/**`,
-`…/components/EcraatRegisterButton/**`, `…/Stage/StageReplicateButton/**`,
-`scripts/analyzeChunkCycles.mjs`, `.npmrc`.
+ProfileSetupWarning, TestingBanner, RelatedProgramEvents, isRelatedEventProgram),
+`…/components/EcraatHomePage/**`, `…/components/EcraatRegisterButton/**`,
+`…/Stage/StageReplicateButton/**`, `scripts/analyzeChunkCycles.mjs`,
+`patches/@dhis2+cli-app-scripts+*.patch`, `.npmrc`.
 
 **Modified upstream files (re-apply intent):** `src/index.tsx`,
 `src/components/App/AppContents.component.tsx`, `d2.config.js`, `package.json`,
@@ -452,7 +542,10 @@ MainPageBody, ScopeSelector, TemplateSelector, ListViewMain, LayoutComponentConf
 EnrollmentPageDefault.container, EnrollmentQuickActions, EnrollmentPageLayout,
 EnrollmentBreadcrumb, WidgetProfile (+types), Stages, StageCreateNewButton, Stage, StageDetail,
 NewEventWorkspace, EditEventDataEntry, DataEntry (WidgetEnrollmentEventNew),
-getOpenDataEntryActions, DefaultPageLayout.constants (EnrollmentEditEvent),
+DataEntry (SingleEventRegistrationEntry), getOpenDataEntryActions,
+DefaultPageLayout.constants (EnrollmentEditEvent + EnrollmentPageDefault),
+DefaultEnrollmentLayout.types, EventDetailsSection, NotesSection, RightColumnWrapper,
+ViewEvent.component (+ viewEvent.actions, viewEvent.epics),
 WidgetCollapsible (+types), WidgetStagesAndEvents, and the seven page TopBar containers.
 
 ---
@@ -479,6 +572,9 @@ since the last cycle — search by component name if a path is stale.
 | **EditEventDataEntry** | `WidgetEventEdit/EditEventDataEntry/EditEventDataEntry.component.tsx` | Edit event form (tabs + OrgUnit field) |
 | **DataEntry (New)** | `WidgetEnrollmentEventNew/DataEntry/DataEntry.component.tsx` | New event data entry compose chain |
 | **WidgetProfile** | `WidgetProfile/WidgetProfile.component.tsx` | Profile card (gets `actionsOnly` mode) |
+| **EventDetailsSection** | `Pages/ViewEvent/EventDetailsSection/EventDetailsSection.component.tsx` | Read-only event viewer main column (notes, edit button) |
+| **RightColumnWrapper / NotesSection** | `Pages/ViewEvent/RightColumn/…` | ViewEvent side widgets (notes moved out — 4.10) |
+| **ViewEvent + actions/epics** | `Pages/ViewEvent/ViewEventComponent/…`, `Pages/ViewEvent/epics/…` | Event viewer shell, back-navigation (4.15) |
 | **WidgetCollapsible** | `Widget/WidgetCollapsible.component.tsx` | Collapsible widget shell (gets `contentClassName`) |
 | **AppContents** | `src/components/App/AppContents.component.tsx` | App shell (security gate, bottom padding) |
 
@@ -529,6 +625,8 @@ EnrollmentPageDefault (waits for prefill fetch — 4.11)
         │       └── Stage
         │           ├── "New blank … event"             ← (4.9)
         │           └── "Replicate last … event"        ← (4.9)
+        ├── RelatedProgramEvents (1 card/program)       ← read-only cards (4.15)
+        │   └── rows → read-only ViewEvent page
         ├── [QuickActions]                              ← HIDDEN (4.6)
         ├── [EnrollmentNote]                            ← HIDDEN (4.6)
         ├── [EnrollmentWidget]                          ← HIDDEN (4.6)
@@ -543,10 +641,18 @@ NewEventWorkspace / EditEventDataEntry
 │   ├── "Report"                               ← visible
 │   └── "Schedule"                             ← HIDDEN (4.10)
 └── DataEntry compose chain
+    ├── "Notes about this event"               ← at TOP, renamed (4.10)
     ├── Report date                            ← visible (prefilled on target stage — 4.11)
     ├── Organisation unit                      ← HIDDEN via isApplicable (4.10)
-    ├── Geometry / Assignee                    ← upstream conditionals, untouched
-    └── Notes                                  ← HIDDEN (4.10; EventNote widget also removed on edit page)
+    └── Geometry / Assignee                    ← upstream conditionals, untouched
+
+Edit-event page: EventNote widget at TOP of left column, before the workspace (4.10)
+
+ViewEvent page (also used read-only by 4.15)
+└── EventDetailsSection
+    ├── "Notes about this event"               ← moved from right column (4.10);
+    │                                            hidden for related-program events (4.15)
+    └── Event details (Edit button hidden for related-program events — 4.15)
 ```
 
 ---
@@ -555,8 +661,9 @@ NewEventWorkspace / EditEventDataEntry
 
 1. **Prefix additions** with `Ecraat` (components/folders) or `ecraat` (files); **comment every
    upstream edit** with `// ECRAAT:` so `grep -r "ECRAAT" src/` finds them.
-2. **Never remove upstream code** — add conditional blocks around it (the one sanctioned
-   exception: the EventNote removal in 4.10, kept clearly marked).
+2. **Never remove upstream code** — add conditional blocks around it. (Small relocations are
+   acceptable when the intent is repositioning, e.g. the notes section moves in 4.10 — keep the
+   upstream component intact and marked.)
 3. **Every toggle/ID lives in `ecraat-config.ts`**; setting a flag to `false`/`null` must restore
    stock behavior.
 4. **Hiding elements:** prefer code-level conditionals via upstream extension points; use
